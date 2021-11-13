@@ -8,7 +8,7 @@
     <title>FB2 Reader</title>
     <style>
         body {
-            margin: 10px;
+            margin: 0;
             background: beige;
         }
         .book-wrapper {
@@ -34,8 +34,31 @@
             width: 80%;
             max-height: 70vh;
         }
-        .book-annotation {
+        input#f {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .book-info-trigger {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            height: 15px;
+            z-index: 5;
+        }
+        .book-info {
             display: none;
+            position: absolute;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            height: auto;
+            color: white;
+        }
+        .book-info-trigger:hover + .book-info, .book-info:hover {
+            display: block;
         }
     </style>
 </head>
@@ -51,7 +74,7 @@
 <script>
     const fEl = document.getElementById('f');
     const defaultEncoding = 'utf-8';
-    let xml, doc;
+    let xml;
 
     function stripTags(text) {
         const t = document.createElement('div');
@@ -87,13 +110,15 @@
         const meta = getMeta(xml);
         const t = document.createElement('div');
         t.innerHTML = `
+<div class="book-info-trigger"></div><div class="book-info">
 <div>Автор${meta.authors.length > 1 ? 'ы' : ''}: ${meta.authors.join(', ')}</div>
 <div>Название: ${meta.title}</div>
 ${meta.sequenceName ? `<div>Серия: ${meta.sequenceName}, том ${meta.sequenceNumber}</div>` : ''}
-<div class="book-annotation">${meta.annotation.innerHTML}</div>`;
+<div class="book-annotation">${meta.annotation.innerHTML}</div></div>`;
 
         document.body.appendChild(t);
-        renderBook(xml);
+
+        return renderBook(xml);
     }
 
     function getImageContentType(b64str) {
@@ -172,12 +197,14 @@ ${meta.sequenceName ? `<div>Серия: ${meta.sequenceName}, том ${meta.sequ
         xml = await readFb2File(fb2File);
         if (!xml.querySelector('FictionBook')) throw new DOMException('Non-FB2 document detected', 'NONFB2');
 
-        showBookContents(xml);
+        await showBookContents(xml);
     }
 
     fEl.addEventListener('change', () => {
         if (fEl.files.length === 0) return;
-        processFile(fEl.files[0]).catch(e => {
+        processFile(fEl.files[0]).then(() => {
+            fEl.style.visibility = 'hidden';
+        }, e => {
             console.log(e);
             alert(e.message);
         })
@@ -211,7 +238,7 @@ ${meta.sequenceName ? `<div>Серия: ${meta.sequenceName}, том ${meta.sequ
      * 5. Move all from "doc.body.children" to wrapper
      */
     async function renderBook(xml) {
-        doc = await parseFb2ToHtml(xml);
+        const doc = await parseFb2ToHtml(xml);
 
         const images = doc.querySelectorAll('img[data-src]');
         const binaries = Array.from(xml.getElementsByTagName('binary'));
@@ -221,7 +248,11 @@ ${meta.sequenceName ? `<div>Серия: ${meta.sequenceName}, том ${meta.sequ
             image.src = getImageSrc(binariesMap[image.dataset.src]);
         });
 
-        document.body.appendChild(doc.body.firstChild);
+        const htmlBook = doc.body.firstChild;
+
+        document.body.appendChild(htmlBook);
+
+        return htmlBook;
     }
 </script>
 </body>
