@@ -6,6 +6,38 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>FB2 Reader</title>
+    <style>
+        body {
+            margin: 10px;
+            background: beige;
+        }
+        .book-wrapper {
+            columns: 2;
+            height: 80vh;
+            overflow-y: hidden;
+            overflow-x: scroll;
+            column-gap: 20px;
+        }
+        .book-wrapper section,
+        .book-wrapper p,
+        .book-wrapper p {
+            font-size: 18px;
+            line-height: 1.5;
+        }
+        .image-block {
+            text-align: center;
+            break-inside: avoid-column;
+            page-break-inside: avoid;
+        }
+        .image-block img {
+            object-fit: contain;
+            width: 80%;
+            max-height: 70vh;
+        }
+        .book-annotation {
+            display: none;
+        }
+    </style>
 </head>
 <body>
 <input type="file" accept=".fb2, .zip" id="f">
@@ -19,7 +51,7 @@
 <script>
     const fEl = document.getElementById('f');
     const defaultEncoding = 'utf-8';
-    let xml;
+    let xml, doc;
 
     function stripTags(text) {
         const t = document.createElement('div');
@@ -58,17 +90,10 @@
 <div>Автор${meta.authors.length > 1 ? 'ы' : ''}: ${meta.authors.join(', ')}</div>
 <div>Название: ${meta.title}</div>
 ${meta.sequenceName ? `<div>Серия: ${meta.sequenceName}, том ${meta.sequenceNumber}</div>` : ''}
-<div>${meta.annotation.innerHTML}</div>`;
-
-        const binaries = xml.querySelectorAll('binary');
-        if (binaries) {
-            Array.from(binaries).forEach(binary => {
-                const img = getImage(binary);
-                t.appendChild(img);
-            })
-        }
+<div class="book-annotation">${meta.annotation.innerHTML}</div>`;
 
         document.body.appendChild(t);
+        renderBook(xml);
     }
 
     function getImageContentType(b64str) {
@@ -84,10 +109,21 @@ ${meta.sequenceName ? `<div>Серия: ${meta.sequenceName}, том ${meta.sequ
         return 'image/unknown';
     }
 
+    const imageSrcCache = new WeakMap();
+
+    function getImageSrc(binary) {
+        if (imageSrcCache.has(binary)) return imageSrcCache.get(binary);
+
+        const contentType = binary.attributes['content-type']?.value ?? getImageContentType(binary.innerHTML);
+        const data = `data:${contentType};base64, ` + binary.innerHTML
+        imageSrcCache.set(binary, data);
+
+        return data;
+    }
+
     function getImage(binary) {
         const img = document.createElement('img');
-        const contentType = binary.attributes['content-type']?.value ?? getImageContentType(binary.innerHTML);
-        img.src = `data:${contentType};base64, ` + binary.innerHTML;
+        img.src = getImageSrc(binary);
         img.id = binary.attributes.id.value;
 
         return img;
@@ -174,6 +210,19 @@ ${meta.sequenceName ? `<div>Серия: ${meta.sequenceName}, том ${meta.sequ
      * 4. Create wrapper and append to DOM
      * 5. Move all from "doc.body.children" to wrapper
      */
+    async function renderBook(xml) {
+        doc = await parseFb2ToHtml(xml);
+
+        const images = doc.querySelectorAll('img[data-src]');
+        const binaries = Array.from(xml.getElementsByTagName('binary'));
+        const binariesMap = Object.fromEntries(binaries.map(binary => [binary.id, binary]));
+
+        images.forEach(image => {
+            image.src = getImageSrc(binariesMap[image.dataset.src]);
+        });
+
+        document.body.appendChild(doc.body.firstChild);
+    }
 </script>
 </body>
 </html>

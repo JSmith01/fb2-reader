@@ -18,14 +18,13 @@
 
     <!-- sequence -->
     <xsl:template name="sequence">
-        <LI/>
         <xsl:value-of select="@name"/>
         <xsl:if test="@number">
             <xsl:text disable-output-escaping="no">,&#032;#</xsl:text>
             <xsl:value-of select="@number"/>
         </xsl:if>
         <xsl:if test="fb:sequence">
-            <UL>
+            <UL class="sequence">
                 <xsl:for-each select="fb:sequence">
                     <xsl:call-template name="sequence"/>
                 </xsl:for-each>
@@ -48,7 +47,7 @@
             <li>
                 <xsl:apply-templates select="fb:title" mode="toc"/>
                 <xsl:if test="(.//fb:section/fb:title) and (count(ancestor::fb:section) &lt; $tocdepth or $tocdepth=	4)">
-                    <UL><xsl:apply-templates select="fb:section" mode="toc"/></UL>
+                    <UL class="section-toc"><xsl:apply-templates select="fb:section" mode="toc"/></UL>
                 </xsl:if>
             </li>
         </xsl:if>
@@ -80,7 +79,7 @@
     <xsl:template match="fb:section">
         <xsl:call-template name="preexisting_id"/>
         <xsl:apply-templates select="fb:title"/>
-        <div><xsl:apply-templates select="fb:*[name()!='title']"/></div>
+        <section><xsl:apply-templates select="fb:*[name()!='title']"/></section>
     </xsl:template>
 
     <!-- title -->
@@ -127,7 +126,7 @@
     <!-- subtitle -->
     <xsl:template match="fb:subtitle">
         <xsl:call-template name="preexisting_id"/>
-        <h5>
+        <h5 class="subtitle">
             <xsl:apply-templates/>
         </h5>
     </xsl:template>
@@ -188,27 +187,25 @@
 
     <!-- epigraph -->
     <xsl:template match="fb:epigraph">
-        <blockquote class="epigraph">
+        <div class="epigraph">
             <xsl:call-template name="preexisting_id"/>
             <xsl:apply-templates/>
-        </blockquote>
+        </div>
         <xsl:if test="name(./following-sibling::node()) = 'epigraph'"><br/></xsl:if>
         <br/>
     </xsl:template>
 
     <!-- epigraph/text-author -->
     <xsl:template match="fb:epigraph/fb:text-author">
-        <blockquote>
-            <b><i><xsl:apply-templates/></i></b>
-        </blockquote>
+        <div class="epigraph-author"><xsl:apply-templates/></div>
     </xsl:template>
 
     <!-- cite -->
     <xsl:template match="fb:cite">
-        <blockquote>
+        <div class="cite">
             <xsl:call-template name="preexisting_id"/>
             <xsl:apply-templates/>
-        </blockquote>
+        </div>
     </xsl:template>
 
     <!-- cite/text-author -->
@@ -254,10 +251,10 @@
     <!-- image - inline -->
     <xsl:template match="fb:p/fb:image|fb:v/fb:image|fb:td/fb:image|fb:subtitle/fb:image">
         <xsl:if test="$saveimages &gt; 0">
-            <img border="0">
+            <img>
                 <xsl:choose>
                     <xsl:when test="starts-with(@xlink:href,'#')">
-                        <xsl:attribute name="src"><xsl:value-of select="substring-after(@xlink:href,'#')"/></xsl:attribute>
+                        <xsl:attribute name="data-src"><xsl:value-of select="substring-after(@xlink:href,'#')"/></xsl:attribute>
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:attribute name="src"><xsl:value-of select="@xlink:href"/></xsl:attribute>
@@ -270,11 +267,11 @@
     <!-- image - block -->
     <xsl:template match="fb:image">
         <xsl:if test="$saveimages &gt; 0">
-            <div align="center">
-                <img border="1">
+            <div class="image-block">
+                <img>
                     <xsl:choose>
                         <xsl:when test="starts-with(@xlink:href,'#')">
-                            <xsl:attribute name="src"><xsl:value-of select="substring-after(@xlink:href,'#')"/></xsl:attribute>
+                            <xsl:attribute name="data-src"><xsl:value-of select="substring-after(@xlink:href,'#')"/></xsl:attribute>
                         </xsl:when>
                         <xsl:otherwise>
                             <xsl:attribute name="src"><xsl:value-of select="@xlink:href"/></xsl:attribute>
@@ -310,12 +307,11 @@
     <xsl:template match="/*">
         <html>
             <head>
-                <META content="text/html; charset=windows-1251" http-equiv="Content-Type"/>
                 <title>
                     <xsl:value-of select="fb:description/fb:title-info/fb:book-title"/>
                 </title>
             </head>
-            <body>
+            <body><main class="book-wrapper">
                 <xsl:apply-templates select="fb:description/fb:title-info/fb:coverpage/fb:image"/>
                 <h1><xsl:apply-templates select="fb:description/fb:title-info/fb:book-title"/></h1>
                 <h2>
@@ -345,15 +341,15 @@
                 <!-- BUILD TOC -->
                 <xsl:if test="$tocdepth &gt; 0 and count(//fb:body[not(@name) or @name != 'notes']//fb:title) &gt; 1">
                     <hr/>
-                    <blockquote>
+                    <div class="toc">
                         <ul>
                             <xsl:apply-templates select="fb:body" mode="toc"/>
                         </ul>
-                    </blockquote>
+                    </div>
                 </xsl:if>
                 <!-- BUILD BOOK -->
                 <xsl:call-template name="DocGen"/>
-            </body>
+            </main></body>
         </html>
     </xsl:template>
 </xsl:stylesheet>
