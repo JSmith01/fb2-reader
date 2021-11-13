@@ -15,7 +15,7 @@
             columns: 2;
             height: 80vh;
             overflow-y: hidden;
-            overflow-x: scroll;
+            overflow-x: hidden;
             column-gap: 20px;
         }
         .book-wrapper section,
@@ -60,11 +60,24 @@
         .book-info-trigger:hover + .book-info, .book-info:hover {
             display: block;
         }
+        footer {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 5px;
+            background: rgba(0, 0, 0, 0.1);
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
+
+<footer>Page <span id="curPage">0</span> of <span id="totalPages">0</span></footer>
 <input type="file" accept=".fb2, .zip" id="f">
+
 <script src="unzipit.min.js"></script>
+
 <script>
     unzipit.setOptions({
         workerURL: 'unzipit-worker.min.js',
@@ -197,18 +210,49 @@ ${meta.sequenceName ? `<div>Серия: ${meta.sequenceName}, том ${meta.sequ
         xml = await readFb2File(fb2File);
         if (!xml.querySelector('FictionBook')) throw new DOMException('Non-FB2 document detected', 'NONFB2');
 
-        await showBookContents(xml);
+        return showBookContents(xml);
     }
 
+    let bookPosition;
     fEl.addEventListener('change', () => {
         if (fEl.files.length === 0) return;
-        processFile(fEl.files[0]).then(() => {
+        processFile(fEl.files[0]).then(htmlBook => {
             fEl.style.visibility = 'hidden';
+            bookPosition = new BookPosition(htmlBook);
+            window.addEventListener('keyup', pageControl);
+            setTimeout(() => {
+                bookPosition.calcPagination();
+                updateFooter();
+            }, 20);
         }, e => {
             console.log(e);
             alert(e.message);
         })
     });
+
+    function updateFooter() {
+        document.getElementById('totalPages').innerText = bookPosition.getTotalPages();
+        document.getElementById('curPage').innerText = bookPosition.getCurrentPage() + 1;
+    }
+
+    function pageControl(e) {
+        function go(delta) {
+            e.preventDefault();
+            e.stopPropagation();
+            let page = bookPosition.getCurrentPage();
+            const pagesPerSpread = bookPosition.getPagesPerSpread();
+            const totalPages = bookPosition.getTotalPages();
+            bookPosition.goToPage(page + delta * pagesPerSpread);
+            updateFooter();
+        }
+
+        switch (e.key) {
+            case 'PageUp': return go(-1);
+            case 'PageDown': return go(1);
+            case 'Home': return go(-Infinity);
+            case 'End': return go(+Infinity);
+        }
+    }
 
     function loadXml(url) {
         return new Promise((resolve, reject) => {
@@ -230,13 +274,6 @@ ${meta.sequenceName ? `<div>Серия: ${meta.sequenceName}, том ${meta.sequ
         return xsltProcessor.transformToDocument(xml);
     }
 
-    /**
-     * 1. Load Fb2
-     * 2. Parse to html -> doc = parseFb2ToHtml(xml)
-     * 3. Replace img to correct inline images
-     * 4. Create wrapper and append to DOM
-     * 5. Move all from "doc.body.children" to wrapper
-     */
     async function renderBook(xml) {
         const doc = await parseFb2ToHtml(xml);
 
@@ -253,6 +290,74 @@ ${meta.sequenceName ? `<div>Серия: ${meta.sequenceName}, том ${meta.sequ
         document.body.appendChild(htmlBook);
 
         return htmlBook;
+    }
+
+    class BookPosition {
+        bookSpreadSize = 0;
+        gap = 20;
+        /** @type {HTMLElement} */
+        htmlBook = null;
+        currentBookSpread = 0;
+        totalPages = 0;
+        bookSpreads = 0;
+        columnsOnPage = 2;
+
+        constructor(htmlBook, columnsOnPage = 2) {
+            this.htmlBook = htmlBook;
+            this.columnsOnPage = columnsOnPage || 2;
+        }
+
+        getCurrentPage() {
+            return this.currentBookSpread * this.columnsOnPage;
+        }
+
+        getPagesPerSpread() {
+            return this.columnsOnPage;
+        }
+
+        getTotalPages() {
+            return this.totalPages;
+        }
+
+        updatePageDims() {
+            this.bookSpreadSize = this.htmlBook.getBoundingClientRect().width;
+            const gapFromStyle = parseInt(window.getComputedStyle(this.htmlBook).columnGap);
+            if (gapFromStyle > 0) this.gap = gapFromStyle;
+        }
+
+        calcPagination() {
+            this.updatePageDims();
+            const rawBookSpreads = (this.htmlBook.scrollWidth + this.gap) / (this.bookSpreadSize + this.gap);
+            this.totalPages = Math.ceil(rawBookSpreads * this.columnsOnPage);
+            this.bookSpreads = Math.ceil(rawBookSpreads);
+            this._applyBookSpreadLimits();
+        }
+
+        adjustScrollPosition() {
+            this.htmlBook.scrollLeft = this.currentBookSpread * (this.bookSpreadSize + this.gap);
+        }
+
+        _applyBookSpreadLimits() {
+            if (this.currentBookSpread > this.bookSpreads - 1) {
+                this.currentBookSpread = this.bookSpreads - 1;
+            }
+            if (this.currentBookSpread < 0) {
+                this.currentBookSpread = 0;
+            }
+        }
+
+        goToPage(n) {
+            if (n != null) {
+                this.currentBookSpread = Math.floor(n / this.columnsOnPage);
+                this._applyBookSpreadLimits();
+            } else {
+                this.calcPagination();
+            }
+
+            this.adjustScrollPosition();
+
+            return this.currentBookSpread * this.columnsOnPage;
+        }
     }
 </script>
 </body>
