@@ -10,7 +10,7 @@
 </head>
 <body>
 
-<footer>Page <span id="curPage">0</span> of <span id="totalPages">0</span></footer>
+<footer>Page <span id="curPage">0</span> of <span id="totalPages">0</span> (<span id="curPercent">0</span>%)</footer>
 <input type="file" accept=".fb2, .zip" id="f">
 <div id="book"></div>
 
@@ -170,8 +170,12 @@ ${meta.sequenceName ? `<div>Серия: ${meta.sequenceName}, том ${meta.sequ
     });
 
     function updateFooter() {
-        document.getElementById('totalPages').innerText = bookPosition.getTotalPages();
-        document.getElementById('curPage').innerText = bookPosition.getCurrentPage() + 1;
+        const totalPages = bookPosition.getTotalPages();
+        const currentPage = bookPosition.getCurrentPage() + 1;
+        const percentage = (currentPage - 1) / Math.max(1, totalPages - 1) * 100;
+        document.getElementById('totalPages').innerText = totalPages;
+        document.getElementById('curPage').innerText = currentPage;
+        document.getElementById('curPercent').innerText = percentage.toFixed(1);
     }
 
     function pageControl(e) {
@@ -180,7 +184,6 @@ ${meta.sequenceName ? `<div>Серия: ${meta.sequenceName}, том ${meta.sequ
             e.stopPropagation();
             let page = bookPosition.getCurrentPage();
             const pagesPerSpread = bookPosition.getPagesPerSpread();
-            const totalPages = bookPosition.getTotalPages();
             bookPosition.goToPage(page + delta * pagesPerSpread);
             updateFooter();
         }
