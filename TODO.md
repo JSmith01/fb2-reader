@@ -1,6 +1,6 @@
 # TODO List
 
-* resize observer with percent saving
+* ~~resize observer with percent saving~~
 * progress line
 * progress line click navigation
 * handle in-book links and add "back" button to UI
@@ -14,3 +14,5 @@
 * switch to single column using media query
 * UI design
 * service worker for offline mode
+* dark/night mode
+* show time & battery (if available) - when in full screen

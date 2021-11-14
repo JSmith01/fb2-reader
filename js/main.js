@@ -11,19 +11,15 @@ const fEl = document.getElementById('f');
 const bookEl = document.getElementById('book');
 let xml;
 
-function showBookContents(xml) {
+function showBookInfo(xml) {
     const meta = getMeta(xml);
-    const t = document.createElement('div');
-    t.innerHTML = `
-<div class="book-info-trigger"></div><div class="book-info">
+
+    const info = document.getElementById('top-book-info');
+    info.innerHTML = `
 <div>Автор${meta.authors.length > 1 ? 'ы' : ''}: ${meta.authors.join(', ')}</div>
 <div>Название: ${meta.title}</div>
 ${meta.sequenceName ? `<div>Серия: ${meta.sequenceName}, том ${meta.sequenceNumber}</div>` : ''}
-<div class="book-annotation">${meta.annotation.innerHTML}</div></div>`;
-
-    document.body.appendChild(t);
-
-    return renderBook(xml);
+<div class="book-annotation">${meta.annotation.innerHTML}</div>`;
 }
 
 async function unzipFb2(file) {
@@ -34,30 +30,66 @@ async function unzipFb2(file) {
     return entries[fb2FileName].blob();
 }
 
+/**
+ * @param {File} file
+ * @return {Promise<HTMLElement>}
+ */
 async function processFile(file) {
     const fb2File = file.name.endsWith('.zip') ? await unzipFb2(file) : file;
     xml = await readFb2File(fb2File);
     if (!xml.querySelector('FictionBook')) throw new DOMException('Non-FB2 document detected', 'NONFB2');
 
-    return showBookContents(xml);
+    showBookInfo(xml);
+
+    return renderBook(xml);
+}
+
+function bookCleanup() {
+    if (!bookPosition) return;
+
+    if (finalizeBookTo) {
+        clearTimeout(finalizeBookTo);
+        finalizeBookTo = null;
+    }
+    bookResizeObserver?.disconnect();
+    bookResizeObserver = null;
+    window.removeEventListener('keyup', pageControl);
+    bookPosition = null;
+    if (bookEl.hasChildNodes()) {
+        bookEl.removeChild(bookEl.firstChild);
+    }
 }
 
 /** @type {BookPosition} */
-let bookPosition;
-fEl.addEventListener('change', () => {
-    if (fEl.files.length === 0) return;
-    processFile(fEl.files[0]).then(htmlBook => {
+let bookPosition = null;
+let finalizeBookTo = null;
+/** @type {ResizeObserver} */
+let bookResizeObserver = null;
+
+function handleFile(file) {
+    processFile(file).then(htmlBook => {
+        bookEl.appendChild(htmlBook);
         fEl.style.visibility = 'hidden';
         bookPosition = new BookPosition(htmlBook);
         window.addEventListener('keyup', pageControl);
-        setTimeout(() => {
+        finalizeBookTo = setTimeout(() => {
             bookPosition.calcPagination();
             updateFooter();
+            bookResizeObserver = new ResizeObserver(() => {
+                bookPosition.handleDomChanges();
+                updateFooter();
+            });
+            bookResizeObserver.observe(htmlBook);
+            finalizeBookTo = null;
         }, 20);
     }, e => {
         console.log(e);
         alert(e.message);
     })
+}
+
+fEl.addEventListener('change', () => {
+    if (fEl.files.length > 0) handleFile(fEl.files[0]);
 });
 
 function updateFooter() {
@@ -97,8 +129,6 @@ async function renderBook(xml) {
     });
 
     const htmlBook = doc.body.firstChild;
-
-    bookEl.appendChild(htmlBook);
 
     return htmlBook;
 }

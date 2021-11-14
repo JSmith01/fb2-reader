@@ -27,7 +27,7 @@ body {
     max-height: 70vh;
 }
 input#f {
-    z-index: 3;
+    z-index: 7;
     position: absolute;
     top: 0;
     left: 0;
