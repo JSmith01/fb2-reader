@@ -13,7 +13,7 @@
         <xsl:value-of select="fb:middle-name"/>&#032;
         <xsl:text disable-output-escaping="no">&#032;</xsl:text>
         <xsl:value-of select="fb:last-name"/>
-        <xsl:text disable-output-escaping="yes">&lt;br&gt;</xsl:text>
+        <br/>
     </xsl:template>
 
     <!-- sequence -->
@@ -23,14 +23,6 @@
             <xsl:text disable-output-escaping="no">,&#032;#</xsl:text>
             <xsl:value-of select="@number"/>
         </xsl:if>
-        <xsl:if test="fb:sequence">
-            <UL class="sequence">
-                <xsl:for-each select="fb:sequence">
-                    <xsl:call-template name="sequence"/>
-                </xsl:for-each>
-            </UL>
-        </xsl:if>
-        <!--      <xsl:text disable-output-escaping="yes">&lt;br&gt;</xsl:text> -->
     </xsl:template>
 
     <!-- toc template: body -->
@@ -46,7 +38,7 @@
         <xsl:if test="fb:title | .//fb:section[count(ancestor::fb:section) &lt; $tocdepth]/fb:title">
             <li>
                 <xsl:apply-templates select="fb:title" mode="toc"/>
-                <xsl:if test="(.//fb:section/fb:title) and (count(ancestor::fb:section) &lt; $tocdepth or $tocdepth=	4)">
+                <xsl:if test="(.//fb:section/fb:title) and (count(ancestor::fb:section) &lt; $tocdepth or $tocdepth=4)">
                     <UL class="section-toc"><xsl:apply-templates select="fb:section" mode="toc"/></UL>
                 </xsl:if>
             </li>
@@ -119,7 +111,7 @@
 
     <!-- title/p and the like -->
     <xsl:template match="fb:title/fb:p|fb:title-info/fb:book-title">
-        <xsl:apply-templates/><xsl:text disable-output-escaping="yes">&lt;br&gt;</xsl:text>
+        <p><xsl:apply-templates/></p>
     </xsl:template>
 
 
@@ -133,7 +125,9 @@
 
 
     <!-- p -->
-    <xsl:template match="fb:p"><xsl:call-template name="preexisting_id"/>&#160;&#160;&#160;<xsl:apply-templates/><xsl:text disable-output-escaping="yes">&lt;br&gt;</xsl:text></xsl:template>
+    <xsl:template match="fb:p">
+        <p><xsl:call-template name="preexisting_id"/>&#160;&#160;&#160;<xsl:apply-templates/></p>
+    </xsl:template>
 
     <!-- strong -->
     <xsl:template match="fb:strong">
@@ -152,7 +146,7 @@
 
     <!-- empty-line -->
     <xsl:template match="fb:empty-line">
-        &#160;<xsl:text disable-output-escaping="yes">&lt;br&gt;</xsl:text>
+        &#160;<br/>
     </xsl:template>
 
     <!-- link -->
@@ -218,11 +212,11 @@
         <xsl:choose>
             <xsl:when test="not(@value)">
                 &#160;&#160;&#160;<xsl:apply-templates/>
-                <xsl:text disable-output-escaping="yes">&lt;br&gt;</xsl:text>
+                <br/>
             </xsl:when>
             <xsl:otherwise>
                 &#160;&#160;&#160;<xsl:value-of select="@value"/>
-                <xsl:text disable-output-escaping="yes">&lt;br&gt;</xsl:text>
+                <br/>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
@@ -237,15 +231,15 @@
 
     <!-- stanza -->
     <xsl:template match="fb:stanza">
-        &#160;<xsl:text disable-output-escaping="yes">&lt;br&gt;</xsl:text>
+        &#160;<br/>
         <xsl:apply-templates/>
-        &#160;<xsl:text disable-output-escaping="yes">&lt;br&gt;</xsl:text>
+        &#160;<br/>
     </xsl:template>
 
     <!-- v -->
     <xsl:template match="fb:v">
         <xsl:call-template name="preexisting_id"/>
-        <xsl:apply-templates/><xsl:text disable-output-escaping="yes">&lt;br&gt;</xsl:text>
+        <xsl:apply-templates/><br/>
     </xsl:template>
 
     <!-- image - inline -->
@@ -299,7 +293,7 @@
                 <xsl:when test="@name"><h4><xsl:value-of select="@name"/></h4></xsl:when>
             </xsl:choose>
             <!-- <xsl:apply-templates /> -->
-            <xsl:apply-templates/>
+            <article><xsl:apply-templates/></article>
         </xsl:for-each>
     </xsl:template>
 
@@ -324,15 +318,13 @@
                     </small>
                 </h2>
                 <xsl:if test="fb:description/fb:title-info/fb:sequence">
-                    <p>
-                        <xsl:for-each select="fb:description/fb:title-info/fb:sequence">
-                            <xsl:call-template name="sequence"/><xsl:text disable-output-escaping="yes">&lt;br&gt;</xsl:text>
-                        </xsl:for-each>
-                    </p>
+                    <xsl:for-each select="fb:description/fb:title-info/fb:sequence">
+                        <p class="sequence"><xsl:call-template name="sequence"/></p>
+                    </xsl:for-each>
                 </xsl:if>
                 <xsl:if test="$skipannotation = 0">
                     <xsl:for-each select="fb:description/fb:title-info/fb:annotation">
-                        <div>
+                        <div class="annotation">
                             <xsl:call-template name="annotation"/>
                         </div>
                         <hr/>
@@ -348,7 +340,9 @@
                     </div>
                 </xsl:if>
                 <!-- BUILD BOOK -->
-                <xsl:call-template name="DocGen"/>
+                <div class="book-content">
+                    <xsl:call-template name="DocGen"/>
+                </div>
             </main></body>
         </html>
     </xsl:template>
