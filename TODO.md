@@ -4,7 +4,7 @@
 * progress line
 * progress line click navigation
 * handle in-book links and add "back" button to UI
-* book close support
+* ~~book close support~~
 * file drag'n'drop support
 * error handling
 * vertical rhythm + proper book styling

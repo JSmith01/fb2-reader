@@ -9,13 +9,16 @@ setOptions({
 
 const fEl = document.getElementById('f');
 const bookEl = document.getElementById('book');
+const topInfoTrigger = document.getElementById('top-book-info-trigger');
+const closeBookBtn = document.getElementById('close-book');
+const topInfoBlock = document.getElementById('top-book-info');
 let xml;
 
 function showBookInfo(xml) {
     const meta = getMeta(xml);
 
-    const info = document.getElementById('top-book-info');
-    info.innerHTML = `
+    topInfoTrigger.style.display = 'block';
+    topInfoBlock.innerHTML = `
 <div>Автор${meta.authors.length > 1 ? 'ы' : ''}: ${meta.authors.join(', ')}</div>
 <div>Название: ${meta.title}</div>
 ${meta.sequenceName ? `<div>Серия: ${meta.sequenceName}, том ${meta.sequenceNumber}</div>` : ''}
@@ -44,7 +47,7 @@ async function processFile(file) {
     return renderBook(xml);
 }
 
-function bookCleanup() {
+function bookCleanup(full = false) {
     if (!bookPosition) return;
 
     if (finalizeBookTo) {
@@ -58,7 +61,16 @@ function bookCleanup() {
     if (bookEl.hasChildNodes()) {
         bookEl.removeChild(bookEl.firstChild);
     }
+    xml = null;
+    if (full) {
+        topInfoTrigger.style.display = 'none';
+        fEl.style.visibility = 'visible';
+        topInfoBlock.innerHTML = '';
+        fEl.value = '';
+    }
 }
+
+closeBookBtn.addEventListener('click', () => bookCleanup(true));
 
 /** @type {BookPosition} */
 let bookPosition = null;
@@ -68,6 +80,7 @@ let bookResizeObserver = null;
 
 function handleFile(file) {
     processFile(file).then(htmlBook => {
+        bookCleanup();
         bookEl.appendChild(htmlBook);
         fEl.style.visibility = 'hidden';
         bookPosition = new BookPosition(htmlBook);
