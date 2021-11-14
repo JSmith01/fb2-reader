@@ -12,6 +12,7 @@ const bookEl = document.getElementById('book');
 const topInfoTrigger = document.getElementById('top-book-info-trigger');
 const closeBookBtn = document.getElementById('close-book');
 const topInfoBlock = document.getElementById('top-book-info');
+const progressBlock = document.getElementById('progress');
 let xml;
 
 function showBookInfo(xml) {
@@ -58,6 +59,7 @@ function bookCleanup(full = false) {
     bookResizeObserver = null;
     window.removeEventListener('keyup', pageControl);
     bookPosition = null;
+    updateFooter();
     if (bookEl.hasChildNodes()) {
         bookEl.removeChild(bookEl.firstChild);
     }
@@ -71,6 +73,17 @@ function bookCleanup(full = false) {
 }
 
 closeBookBtn.addEventListener('click', () => bookCleanup(true));
+
+function navigateByClick(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (bookPosition) {
+        bookPosition.goToPercent(e.clientX / e.target.clientWidth * 100);
+        updateFooter();
+    }
+}
+
+progressBlock.addEventListener('click', navigateByClick);
 
 /** @type {BookPosition} */
 let bookPosition = null;
@@ -105,10 +118,17 @@ fEl.addEventListener('change', () => {
     if (fEl.files.length > 0) handleFile(fEl.files[0]);
 });
 
+function showPercent(p) {
+    progressBlock.style.setProperty('--percent', p + '%');
+    document.getElementById('curPercent').innerText = p;
+}
+
 function updateFooter() {
-    document.getElementById('totalPages').innerText = bookPosition.getTotalPages();
-    document.getElementById('curPage').innerText = bookPosition.getCurrentPage() + 1;
-    document.getElementById('curPercent').innerText = bookPosition.getCurrentPercent().toFixed(1);
+    document.getElementById('totalPages').innerText =
+        String(bookPosition?.getTotalPages() ?? 0);
+    document.getElementById('curPage').innerText =
+        String((bookPosition?.getCurrentPage()  ?? 0) + (bookPosition ? 1 : 0));
+    showPercent(bookPosition?.getCurrentPercent().toFixed(1) ?? 0);
 }
 
 function pageControl(e) {
@@ -141,7 +161,5 @@ async function renderBook(xml) {
         image.src = getImageSrc(binariesMap[image.dataset.src]);
     });
 
-    const htmlBook = doc.body.firstChild;
-
-    return htmlBook;
+    return doc.body.firstChild;
 }

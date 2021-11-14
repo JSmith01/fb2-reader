@@ -75,8 +75,11 @@ footer {
     right: 0;
     bottom: 0;
     padding: 5px;
-    background: rgba(0, 0, 0, 0.1);
+    --percent: 0%;
+    background: linear-gradient(
+            90deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.1) var(--percent), rgba(0,0,0,0.05) var(--percent), rgba(0,0,0,0.05) 100%);
     font-size: 12px;
+    cursor: pointer;
 }
 #book {
     padding: 20px;
