@@ -1,0 +1,72 @@
+body {
+    margin: 0;
+    background: beige;
+}
+.book-wrapper {
+    columns: 2;
+    height: 100%;
+    overflow-y: hidden;
+    overflow-x: hidden;
+    column-gap: 20px;
+}
+.book-wrapper section,
+.book-wrapper p,
+.book-wrapper p {
+    font-size: 18px;
+    line-height: 1.5;
+    text-align: justify;
+}
+.image-block {
+    text-align: center;
+    break-inside: avoid-column;
+    page-break-inside: avoid;
+}
+.image-block img {
+    object-fit: contain;
+    width: 80%;
+    max-height: 70vh;
+}
+input#f {
+    z-index: 3;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+.book-info-trigger {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 15px;
+    z-index: 5;
+}
+.book-info {
+    display: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 10px;
+    height: auto;
+    color: white;
+}
+.book-info-trigger:hover + .book-info, .book-info:hover {
+    display: block;
+}
+footer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 5px;
+    background: rgba(0, 0, 0, 0.1);
+    font-size: 12px;
+}
+#book {
+    padding: 20px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 20px;
+}
