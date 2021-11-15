@@ -86,17 +86,32 @@ class BookPosition {
 
     goToPercent(p) {
         const k = Math.min(1, Math.max(0, p / 100));
-        this._currentBookSpread = Math.floor((this._bookSpreads - 1) * k);
 
-        this.adjustScrollPosition();
-
-        return this.getCurrentPage();
+        return this.goToPage((this._totalPages - 1) * k);
     }
 
     handleDomChanges() {
         const percent = this.getCurrentPercent();
         this.calcPagination();
         this.goToPercent(percent);
+    }
+
+    getCurrentPageFromScroll() {
+        const curScrollPosition = this._htmlBook.scrollLeft;
+        return Math.ceil(Math.max(0, (curScrollPosition - this._gap / 10)) / (this._bookSpreadSize + this._gap)) * this._pagesPerSpread;
+    }
+
+    goToLinkName(name) {
+        const aEl = this._htmlBook.querySelector(`a[name=${name}]`);
+        if (!aEl) return false;
+        if (!aEl.innerText) {
+            aEl.nextElementSibling.scrollIntoView();
+        }
+        else {
+            aEl.scrollIntoView();
+        }
+        const newPage = this.getCurrentPageFromScroll();
+        this.goToPage(newPage);
     }
 }
 

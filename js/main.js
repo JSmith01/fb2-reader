@@ -74,6 +74,22 @@ function bookCleanup(full = false) {
 
 closeBookBtn.addEventListener('click', () => bookCleanup(true));
 
+/**
+ * @param {MouseEvent} e
+ */
+function handleInternalLinks(e) {
+    if (bookPosition && e.target.nodeName.toLowerCase() === 'a' &&
+        e.target.attributes.href &&
+        e.target.attributes.href.value[0] === '#') {
+        e.preventDefault();
+        e.stopPropagation();
+        const linkName = e.target.attributes.href.value.slice(1);
+        bp.goToLinkName(linkName);
+        updateFooter();
+        console.log(`Go to link ${linkName}`);
+    }
+}
+
 function navigateByClick(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -95,8 +111,10 @@ function handleFile(file) {
     processFile(file).then(htmlBook => {
         bookCleanup();
         bookEl.appendChild(htmlBook);
+        htmlBook.addEventListener('click', handleInternalLinks, true);
         fEl.style.visibility = 'hidden';
         bookPosition = new BookPosition(htmlBook);
+        window.bp = bookPosition;
         window.addEventListener('keyup', pageControl);
         finalizeBookTo = setTimeout(() => {
             bookPosition.calcPagination();
