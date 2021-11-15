@@ -32,7 +32,7 @@ input#f {
     top: 0;
     left: 0;
 }
-#close-book {
+#close-book, #back-link {
     position: absolute;
     top: 10px;
     right: 10px;
@@ -43,6 +43,13 @@ input#f {
     padding: 0;
     line-height: 21px;
     border-radius: 50%;
+}
+#back-link {
+    top: 7px;
+    right: 40px;
+    line-height: 18px;
+    width: 30px;
+    height: 30px;
 }
 #top-book-info:empty + #close-book {
     display: none;

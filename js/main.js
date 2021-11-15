@@ -11,9 +11,15 @@ const fEl = document.getElementById('f');
 const bookEl = document.getElementById('book');
 const topInfoTrigger = document.getElementById('top-book-info-trigger');
 const closeBookBtn = document.getElementById('close-book');
+const backLinkBtn = document.getElementById('back-link');
 const topInfoBlock = document.getElementById('top-book-info');
 const progressBlock = document.getElementById('progress');
 let xml;
+
+function absorb(e) {
+    e.preventDefault();
+    e.stopPropagation();
+}
 
 function showBookInfo(xml) {
     const meta = getMeta(xml);
@@ -60,6 +66,7 @@ function bookCleanup(full = false) {
     window.removeEventListener('keyup', pageControl);
     bookPosition = null;
     updateFooter();
+    internalLinksPath.length = 0;
     if (bookEl.hasChildNodes()) {
         bookEl.removeChild(bookEl.firstChild);
     }
@@ -74,6 +81,8 @@ function bookCleanup(full = false) {
 
 closeBookBtn.addEventListener('click', () => bookCleanup(true));
 
+const internalLinksPath = [];
+
 /**
  * @param {MouseEvent} e
  */
@@ -81,22 +90,37 @@ function handleInternalLinks(e) {
     if (bookPosition && e.target.nodeName.toLowerCase() === 'a' &&
         e.target.attributes.href &&
         e.target.attributes.href.value[0] === '#') {
-        e.preventDefault();
-        e.stopPropagation();
+        absorb(e);
         const linkName = e.target.attributes.href.value.slice(1);
-        bp.goToLinkName(linkName);
-        updateFooter();
-        console.log(`Go to link ${linkName}`);
+        const res = bp.goToLinkName(linkName);
+        if (res) {
+            internalLinksPath.push(e.target);
+            updateFooter();
+            console.log(`Go to link ${linkName}`);
+        }
     }
 }
 
-function navigateByClick(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    if (bookPosition) {
-        bookPosition.goToPercent(e.clientX / e.target.clientWidth * 100);
-        updateFooter();
+backLinkBtn.addEventListener('click', e => {
+    absorb(e);
+    if (!bookPosition || internalLinksPath.length === 0) return;
+    const backRef = internalLinksPath.pop();
+    if (backRef instanceof HTMLElement || typeof backRef === 'string') {
+        bp.goToLinkName(backRef);
+    } else if (typeof backRef === 'number') {
+        bp.goToPercent(backRef);
     }
+    updateFooter();
+});
+
+function navigateByClick(e) {
+    absorb(e);
+    if (!bookPosition) return;
+
+    internalLinksPath.push(bookPosition.getCurrentPercent());
+    const percent = e.clientX / e.target.clientWidth * 100;
+    bookPosition.goToPercent(percent);
+    updateFooter();
 }
 
 progressBlock.addEventListener('click', navigateByClick);
@@ -151,8 +175,7 @@ function updateFooter() {
 
 function pageControl(e) {
     function go(delta) {
-        e.preventDefault();
-        e.stopPropagation();
+        absorb(e);
         let page = bookPosition.getCurrentPage();
         const pagesPerSpread = bookPosition.getPagesPerSpread();
         bookPosition.goToPage(page + delta * pagesPerSpread);
