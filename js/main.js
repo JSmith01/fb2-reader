@@ -160,6 +160,12 @@ fEl.addEventListener('change', () => {
     if (fEl.files.length > 0) handleFile(fEl.files[0]);
 });
 
+bookEl.addEventListener('dragover', absorb);
+bookEl.addEventListener('drop', e => {
+    absorb(e);
+    if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]);
+});
+
 function showPercent(p) {
     progressBlock.style.setProperty('--percent', p + '%');
     document.getElementById('curPercent').innerText = p;
