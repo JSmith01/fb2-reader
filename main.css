@@ -1,6 +1,44 @@
+:root, body.light {
+    --body-background: beige;
+    --body-color: #111;
+    --link-color: #2470B3;
+    --footer-darken: 0.1;
+    --faded-img-opacity: 1;
+}
+body.dark {
+    --body-background: #2b2b2b;
+    --body-color: #a9b7c6;
+    --link-color: #589DF6;
+    --footer-darken: 0.2;
+    --faded-img-opacity: 0.75
+}
+@media (prefers-color-scheme: dark) {
+    :root, body.dark {
+        --body-background: #2b2b2b;
+        --body-color: #a9b7c6;
+        --link-color: #589DF6;
+        --footer-darken: 0.2;
+        --faded-img-opacity: 0.75
+    }
+}
+img {
+    opacity: var(--faded-img-opacity, 1);
+    transition: opacity .5s ease-in-out;
+}
+img:hover {
+    opacity: 1;
+}
 body {
     margin: 0;
-    background: beige;
+    background: var(--body-background, beige);
+    color: var(--body-color, #111);
+}
+a {
+    color: var(--link-color, #2470B3);
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
 }
 .book-wrapper {
     columns: 2;
@@ -32,10 +70,7 @@ input#f {
     top: 0;
     left: 0;
 }
-#close-book, #back-link {
-    position: absolute;
-    top: 10px;
-    right: 10px;
+.ui-btn, .ui-btn-big {
     width: 22px;
     height: 22px;
     text-align: center;
@@ -44,12 +79,19 @@ input#f {
     line-height: 21px;
     border-radius: 50%;
 }
-#back-link {
-    top: 7px;
-    right: 40px;
+.ui-btn-big {
     line-height: 18px;
     width: 30px;
     height: 30px;
+}
+#close-book, #back-link {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+#back-link {
+    top: 7px;
+    right: 40px;
 }
 #top-book-info:empty + #close-book {
     display: none;
@@ -84,7 +126,12 @@ footer {
     padding: 5px;
     --percent: 0%;
     background: linear-gradient(
-            90deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.1) var(--percent), rgba(0,0,0,0.05) var(--percent), rgba(0,0,0,0.05) 100%);
+            90deg,
+            rgba(0,0,0,var(--footer-darken, 0.1)) 0%,
+            rgba(0,0,0,var(--footer-darken, 0.1)) var(--percent),
+            rgba(0,0,0,0.05) var(--percent),
+            rgba(0,0,0,0.05) 100%
+    );
     font-size: 12px;
     cursor: pointer;
 }
@@ -95,4 +142,12 @@ footer {
     right: 0;
     top: 0;
     bottom: 20px;
+}
+.theme-selector {
+    position: absolute;
+    top: 50px;
+    right: 10px;
+}
+.theme-selector button.active {
+    background: lightblue;
 }

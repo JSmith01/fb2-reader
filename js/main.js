@@ -2,6 +2,11 @@ import { unzip, setOptions } from './unzipit.module.js';
 import BookPosition from './book-position.js';
 import { getMeta, readFb2File, parseFb2ToHtml, getImageSrc } from './fb2-utils.js';
 
+const LS_KEY_THEME = 'theme';
+const THEME_LIGHT = 'light';
+const THEME_DARK = 'dark';
+const THEME_OS = '';
+
 setOptions({
     workerURL: '/js/unzipit-worker.module.js',
     numWorkers: 2,
@@ -12,6 +17,8 @@ const bookEl = document.getElementById('book');
 const topInfoTrigger = document.getElementById('top-book-info-trigger');
 const closeBookBtn = document.getElementById('close-book');
 const backLinkBtn = document.getElementById('back-link');
+const lightThemeBtn = document.getElementById('light-theme');
+const darkThemeBtn = document.getElementById('dark-theme');
 const topInfoBlock = document.getElementById('top-book-info');
 const progressBlock = document.getElementById('progress');
 let xml;
@@ -20,6 +27,43 @@ function absorb(e) {
     e.preventDefault();
     e.stopPropagation();
 }
+
+const initialTheme = localStorage[LS_KEY_THEME];
+const ACTIVE = 'active';
+if (initialTheme !== THEME_OS) {
+    if (initialTheme === THEME_LIGHT) {
+        lightThemeBtn.classList.add(ACTIVE);
+    } else {
+        darkThemeBtn.classList.add(ACTIVE);
+    }
+}
+lightThemeBtn.addEventListener('click', e => {
+    absorb(e);
+    const active = lightThemeBtn.classList.toggle(ACTIVE);
+    if (active) {
+        darkThemeBtn.classList.remove(ACTIVE);
+        document.body.classList.add(THEME_LIGHT);
+        localStorage.setItem(LS_KEY_THEME, THEME_LIGHT);
+    } else {
+        document.body.classList.remove(THEME_LIGHT);
+        localStorage.setItem(LS_KEY_THEME, THEME_OS);
+    }
+    document.body.classList.remove(THEME_DARK);
+});
+
+darkThemeBtn.addEventListener('click', e => {
+    absorb(e);
+    const active = darkThemeBtn.classList.toggle(ACTIVE);
+    if (active) {
+        lightThemeBtn.classList.remove(ACTIVE);
+        document.body.classList.add(THEME_DARK);
+        localStorage.setItem(LS_KEY_THEME, THEME_DARK);
+    } else {
+        document.body.classList.remove(THEME_DARK);
+        localStorage.setItem(LS_KEY_THEME, THEME_OS);
+    }
+    document.body.classList.remove(THEME_LIGHT);
+});
 
 function showBookInfo(xml) {
     const meta = getMeta(xml);

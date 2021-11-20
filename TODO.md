@@ -6,7 +6,7 @@
 * ~~handle in-book links~~ and add "back" button to UI
 * ~~book close support~~
 * ~~file drag'n'drop support~~
-* dark/night mode
+* ~~dark/night mode~~
 * bookmark current place (localStorage? IDB?)
 * books saving (IDB)
 * vertical rhythm + proper book styling
