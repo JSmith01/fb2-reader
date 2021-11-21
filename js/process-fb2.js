@@ -1,5 +1,16 @@
+import { unzip, setOptions } from './unzipit.module.js';
+
+setOptions({
+    workerURL: '/js/unzipit-worker.module.js',
+    numWorkers: 2,
+});
+
 const defaultEncoding = 'utf-8';
 
+/**
+ * @param {File} file
+ * @return {Promise<string>}
+ */
 async function getFb2Encoding(file) {
     const initBlock = file.slice(0, 300);
     const initText = await readFileAsText(initBlock);
@@ -16,6 +27,11 @@ async function getFb2Encoding(file) {
     }
 }
 
+/**
+ * @param {File} file
+ * @param {string} encoding
+ * @return {Promise<string>}
+ */
 const readFileAsText = (file, encoding = defaultEncoding) => new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.addEventListener('error', reject);
@@ -23,7 +39,11 @@ const readFileAsText = (file, encoding = defaultEncoding) => new Promise((resolv
     reader.readAsText(file, encoding);
 });
 
-export async function readFb2File(file) {
+/**
+ * @param {File} file
+ * @return {Promise<Document>}
+ */
+async function readFb2File(file) {
     const encoding = await getFb2Encoding(file);
     const content = await readFileAsText(file, encoding);
 
@@ -42,7 +62,12 @@ function loadXml(url) {
 }
 
 let xsltProcessor;
-export async function parseFb2ToHtml(xml) {
+
+/**
+ * @param {Document} xml
+ * @return {Promise<Document>}
+ */
+async function parseFb2ToHtml(xml) {
     if (!xsltProcessor) {
         xsltProcessor = new XSLTProcessor();
         xsltProcessor.importStylesheet(await loadXml('fb2-html.xsl'));
@@ -67,7 +92,7 @@ function getImageContentType(b64str) {
 
 const imageSrcCache = new WeakMap();
 
-export function getImageSrc(binary) {
+function getImageSrc(binary) {
     if (imageSrcCache.has(binary)) return imageSrcCache.get(binary);
 
     const contentType = binary.attributes['content-type']?.value ?? getImageContentType(binary.innerHTML);
@@ -84,6 +109,10 @@ function stripTags(text) {
     return t.innerText;
 }
 
+/**
+ * @param {Element} author
+ * @return {string}
+ */
 function parseAuthor(author) {
     const info = {};
     Array.from(author.children).forEach(child => {
@@ -96,7 +125,20 @@ function parseAuthor(author) {
     } else return '';
 }
 
-export function getMeta(xml) {
+/**
+ * @typedef {object} Fb2Meta
+ * @property {Element} annotation
+ * @property {number} sequenceNumber
+ * @property {string} title
+ * @property {string} sequenceName
+ * @property {string[]} authors
+ */
+
+/**
+ * @param {Document} xml
+ * @return {Fb2Meta}
+ */
+function getMeta(xml) {
     const titleInfo = xml.querySelector('description>title-info');
     const annotation = titleInfo.getElementsByTagName('annotation')[0];
     const title = stripTags(titleInfo.getElementsByTagName('book-title')[0].innerHTML);
@@ -106,4 +148,45 @@ export function getMeta(xml) {
     const sequenceNumber = sequence?.attributes.number?.value;
 
     return { title, authors, annotation, sequenceName, sequenceNumber };
+}
+
+/**
+ * @param {Document} xml
+ * @return {Promise<ChildNode>}
+ */
+async function renderBook(xml) {
+    const doc = await parseFb2ToHtml(xml);
+
+    const images = doc.querySelectorAll('img[data-src]');
+    const binaries = Array.from(xml.getElementsByTagName('binary'));
+    const binariesMap = Object.fromEntries(binaries.map(binary => [binary.id, binary]));
+
+    images.forEach(image => {
+        image.src = getImageSrc(binariesMap[image.dataset.src]);
+    });
+
+    return doc.body.firstChild;
+}
+
+async function unzipFb2(file) {
+    const { entries } = await unzip(file);
+    const fb2FileName = Object.keys(entries).find(name => name.endsWith('.fb2'));
+    if (!fb2FileName) throw new DOMException('No FB2 inside zip', 'ZIP-NONFB2');
+
+    return entries[fb2FileName].blob();
+}
+
+/**
+ * @param {File} file
+ * @return {Promise<[Fb2Meta, ChildNode]>}
+ */
+export default async function processFile(file) {
+    const fb2File = file.name.endsWith('.zip') ? await unzipFb2(file) : file;
+    const xml = await readFb2File(fb2File);
+    if (typeof window === 'object') {
+        window.xml = xml;
+    }
+    if (!xml.querySelector('FictionBook')) throw new DOMException('Non-FB2 document detected', 'NONFB2');
+
+    return [getMeta(xml), await renderBook(xml)];
 }

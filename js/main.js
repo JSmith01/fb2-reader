@@ -1,16 +1,10 @@
-import { unzip, setOptions } from './unzipit.module.js';
+import processFile from './process-fb2.js';
 import BookPosition from './book-position.js';
-import { getMeta, readFb2File, parseFb2ToHtml, getImageSrc } from './fb2-utils.js';
 
 const LS_KEY_THEME = 'theme';
 const THEME_LIGHT = 'light';
 const THEME_DARK = 'dark';
 const THEME_OS = '';
-
-setOptions({
-    workerURL: '/js/unzipit-worker.module.js',
-    numWorkers: 2,
-});
 
 const fEl = document.getElementById('f');
 const bookEl = document.getElementById('book');
@@ -21,14 +15,13 @@ const lightThemeBtn = document.getElementById('light-theme');
 const darkThemeBtn = document.getElementById('dark-theme');
 const topInfoBlock = document.getElementById('top-book-info');
 const progressBlock = document.getElementById('progress');
-let xml;
 
 function absorb(e) {
     e.preventDefault();
     e.stopPropagation();
 }
 
-const initialTheme = localStorage[LS_KEY_THEME];
+const initialTheme = localStorage[LS_KEY_THEME] ?? THEME_OS;
 const ACTIVE = 'active';
 if (initialTheme !== THEME_OS) {
     if (initialTheme === THEME_LIGHT) {
@@ -65,37 +58,13 @@ darkThemeBtn.addEventListener('click', e => {
     document.body.classList.remove(THEME_LIGHT);
 });
 
-function showBookInfo(xml) {
-    const meta = getMeta(xml);
-
+function showBookInfo(meta) {
     topInfoTrigger.style.display = 'block';
     topInfoBlock.innerHTML = `
-<div>Автор${meta.authors.length > 1 ? 'ы' : ''}: ${meta.authors.join(', ')}</div>
-<div>Название: ${meta.title}</div>
-${meta.sequenceName ? `<div>Серия: ${meta.sequenceName}, том ${meta.sequenceNumber}</div>` : ''}
+<div>Author${meta.authors.length > 1 ? 's' : ''}: ${meta.authors.join(', ')}</div>
+<div>Title: ${meta.title}</div>
+${meta.sequenceName ? `<div>Series: ${meta.sequenceName}, #${meta.sequenceNumber}</div>` : ''}
 <div class="book-annotation">${meta.annotation.innerHTML}</div>`;
-}
-
-async function unzipFb2(file) {
-    const { entries } = await unzip(file);
-    const fb2FileName = Object.keys(entries).find(name => name.endsWith('.fb2'));
-    if (!fb2FileName) throw new DOMException('No FB2 inside zip', 'ZIP-NONFB2');
-
-    return entries[fb2FileName].blob();
-}
-
-/**
- * @param {File} file
- * @return {Promise<HTMLElement>}
- */
-async function processFile(file) {
-    const fb2File = file.name.endsWith('.zip') ? await unzipFb2(file) : file;
-    xml = await readFb2File(fb2File);
-    if (!xml.querySelector('FictionBook')) throw new DOMException('Non-FB2 document detected', 'NONFB2');
-
-    showBookInfo(xml);
-
-    return renderBook(xml);
 }
 
 function bookCleanup(full = false) {
@@ -114,7 +83,6 @@ function bookCleanup(full = false) {
     if (bookEl.hasChildNodes()) {
         bookEl.removeChild(bookEl.firstChild);
     }
-    xml = null;
     if (full) {
         topInfoTrigger.style.display = 'none';
         fEl.style.visibility = 'visible';
@@ -176,8 +144,9 @@ let finalizeBookTo = null;
 let bookResizeObserver = null;
 
 function handleFile(file) {
-    processFile(file).then(htmlBook => {
+    processFile(file).then(([meta, htmlBook]) => {
         bookCleanup();
+        showBookInfo(meta);
         bookEl.appendChild(htmlBook);
         htmlBook.addEventListener('click', handleInternalLinks, true);
         fEl.style.visibility = 'hidden';
@@ -239,18 +208,4 @@ function pageControl(e) {
         case 'Home': return go(-Infinity);
         case 'End': return go(+Infinity);
     }
-}
-
-async function renderBook(xml) {
-    const doc = await parseFb2ToHtml(xml);
-
-    const images = doc.querySelectorAll('img[data-src]');
-    const binaries = Array.from(xml.getElementsByTagName('binary'));
-    const binariesMap = Object.fromEntries(binaries.map(binary => [binary.id, binary]));
-
-    images.forEach(image => {
-        image.src = getImageSrc(binariesMap[image.dataset.src]);
-    });
-
-    return doc.body.firstChild;
 }
