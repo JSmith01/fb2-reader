@@ -8,7 +8,7 @@ setOptions({
 const defaultEncoding = 'utf-8';
 
 /**
- * @param {File} file
+ * @param {File|Blob} file
  * @return {Promise<string>}
  */
 async function getFb2Encoding(file) {
@@ -28,7 +28,7 @@ async function getFb2Encoding(file) {
 }
 
 /**
- * @param {File} file
+ * @param {File|Blob} file
  * @param {string} encoding
  * @return {Promise<string>}
  */
@@ -40,7 +40,7 @@ const readFileAsText = (file, encoding = defaultEncoding) => new Promise((resolv
 });
 
 /**
- * @param {File} file
+ * @param {File|Blob} file
  * @return {Promise<Document>}
  */
 async function readFb2File(file) {
@@ -168,6 +168,10 @@ async function renderBook(xml) {
     return doc.body.firstChild;
 }
 
+/**
+ * @param {File} file
+ * @return {Promise<Blob>}
+ */
 async function unzipFb2(file) {
     const { entries } = await unzip(file);
     const fb2FileName = Object.keys(entries).find(name => name.endsWith('.fb2'));
