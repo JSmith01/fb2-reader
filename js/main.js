@@ -1,3 +1,4 @@
+import { set, get } from './idb-keyval.js';
 import processFile from './process-fb2.js';
 import BookPosition from './book-position.js';
 
@@ -21,41 +22,65 @@ function absorb(e) {
     e.stopPropagation();
 }
 
-const initialTheme = localStorage[LS_KEY_THEME] ?? THEME_OS;
-const ACTIVE = 'active';
-if (initialTheme !== THEME_OS) {
-    if (initialTheme === THEME_LIGHT) {
-        lightThemeBtn.classList.add(ACTIVE);
-    } else {
-        darkThemeBtn.classList.add(ACTIVE);
+let themeActive = THEME_OS;
+const setThemeActive = valOrCb => {
+    themeActive = typeof valOrCb === 'function' ? valOrCb(themeActive) : valOrCb;
+    localStorage.setItem(LS_KEY_THEME, themeActive);
+    syncThemeUi();
+}
+
+setThemeActive(localStorage[LS_KEY_THEME] ?? THEME_OS);
+
+function syncThemeUi() {
+    const ACTIVE = 'active';
+
+    switch (themeActive) {
+        case THEME_OS: {
+            document.body.classList.remove(THEME_LIGHT);
+            document.body.classList.remove(THEME_DARK);
+            lightThemeBtn.classList.remove(ACTIVE);
+            darkThemeBtn.classList.remove(ACTIVE);
+            break;
+        }
+        case THEME_LIGHT: {
+            document.body.classList.add(THEME_LIGHT);
+            document.body.classList.remove(THEME_DARK);
+            lightThemeBtn.classList.add(ACTIVE);
+            darkThemeBtn.classList.remove(ACTIVE);
+            break;
+        }
+        case THEME_DARK: {
+            document.body.classList.remove(THEME_LIGHT);
+            document.body.classList.add(THEME_DARK);
+            lightThemeBtn.classList.remove(ACTIVE);
+            darkThemeBtn.classList.add(ACTIVE);
+            break;
+        }
     }
 }
+
+syncThemeUi();
+
 lightThemeBtn.addEventListener('click', e => {
     absorb(e);
-    const active = lightThemeBtn.classList.toggle(ACTIVE);
-    if (active) {
-        darkThemeBtn.classList.remove(ACTIVE);
-        document.body.classList.add(THEME_LIGHT);
-        localStorage.setItem(LS_KEY_THEME, THEME_LIGHT);
-    } else {
-        document.body.classList.remove(THEME_LIGHT);
-        localStorage.setItem(LS_KEY_THEME, THEME_OS);
-    }
-    document.body.classList.remove(THEME_DARK);
+    setThemeActive(themeActive => themeActive === THEME_LIGHT ? THEME_OS : THEME_LIGHT);
 });
 
 darkThemeBtn.addEventListener('click', e => {
     absorb(e);
-    const active = darkThemeBtn.classList.toggle(ACTIVE);
-    if (active) {
-        lightThemeBtn.classList.remove(ACTIVE);
-        document.body.classList.add(THEME_DARK);
-        localStorage.setItem(LS_KEY_THEME, THEME_DARK);
-    } else {
-        document.body.classList.remove(THEME_DARK);
-        localStorage.setItem(LS_KEY_THEME, THEME_OS);
-    }
-    document.body.classList.remove(THEME_LIGHT);
+    setThemeActive(themeActive => themeActive === THEME_DARK ? THEME_OS : THEME_DARK);
+});
+
+preloadSavedFile();
+
+fEl.addEventListener('change', () => {
+    if (fEl.files.length > 0) handleFile(fEl.files[0]);
+});
+
+bookEl.addEventListener('dragover', absorb);
+bookEl.addEventListener('drop', e => {
+    absorb(e);
+    if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]);
 });
 
 function showBookInfo(meta) {
@@ -64,7 +89,7 @@ function showBookInfo(meta) {
 <div>Author${meta.authors.length > 1 ? 's' : ''}: ${meta.authors.join(', ')}</div>
 <div>Title: ${meta.title}</div>
 ${meta.sequenceName ? `<div>Series: ${meta.sequenceName}, #${meta.sequenceNumber}</div>` : ''}
-<div class="book-annotation">${meta.annotation.innerHTML}</div>`;
+<div class="book-annotation">${meta.annotationHtml}</div>`;
 }
 
 function bookCleanup(full = false) {
@@ -143,41 +168,62 @@ let finalizeBookTo = null;
 /** @type {ResizeObserver} */
 let bookResizeObserver = null;
 
-function handleFile(file) {
-    processFile(file).then(([meta, htmlBook]) => {
-        bookCleanup();
-        showBookInfo(meta);
-        bookEl.appendChild(htmlBook);
-        htmlBook.addEventListener('click', handleInternalLinks, true);
-        fEl.style.visibility = 'hidden';
-        bookPosition = new BookPosition(htmlBook);
-        window.bp = bookPosition;
-        window.addEventListener('keyup', pageControl);
-        finalizeBookTo = setTimeout(() => {
-            bookPosition.calcPagination();
-            updateFooter();
-            bookResizeObserver = new ResizeObserver(() => {
-                bookPosition.handleDomChanges();
-                updateFooter();
-            });
-            bookResizeObserver.observe(htmlBook);
-            finalizeBookTo = null;
-        }, 20);
-    }, e => {
-        console.log(e);
-        alert(e.message);
-    })
+async function preloadSavedFile() {
+    const currentBook = await get('current-book');
+    const currentBookPosition = await get('current-book-position');
+    if (currentBook) {
+        const position = currentBookPosition != null ? parseFloat(currentBookPosition) : 0;
+        showParsedFile([currentBook.meta, currentBook.htmlBook], position);
+    }
 }
 
-fEl.addEventListener('change', () => {
-    if (fEl.files.length > 0) handleFile(fEl.files[0]);
-});
+function saveFile([meta, htmlBook]) {
+    set('current-book', { meta, htmlBook: htmlBook.outerHTML });
+    return [meta, htmlBook];
+}
 
-bookEl.addEventListener('dragover', absorb);
-bookEl.addEventListener('drop', e => {
-    absorb(e);
-    if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]);
-});
+function showParsedFile([meta, htmlBook], initialPosition = 0) {
+    bookCleanup();
+    if (typeof htmlBook === 'string') {
+        bookEl.innerHTML = htmlBook;
+    } else {
+        bookEl.appendChild(htmlBook);
+    }
+    showBookInfo(meta);
+    const actualHtmlBook = bookEl.firstChild;
+    actualHtmlBook.addEventListener('click', handleInternalLinks, true);
+    fEl.style.visibility = 'hidden';
+    bookPosition = new BookPosition(actualHtmlBook);
+    window.bp = bookPosition;
+    window.addEventListener('keyup', pageControl);
+    finalizeBookTo = setTimeout(() => {
+        bookPosition.calcPagination();
+        updateFooter();
+        if (initialPosition > 0) {
+            bookPosition.goToPercent(initialPosition);
+        }
+        bookResizeObserver = new ResizeObserver(() => {
+            bookPosition.handleDomChanges();
+            updateFooter();
+        });
+        bookResizeObserver.observe(actualHtmlBook);
+        finalizeBookTo = null;
+    }, 20);
+}
+
+function handleFile(file) {
+    processFile(file).then(saveFile).then(
+        showParsedFile,
+        e => {
+            console.log(e);
+            alert(e.message);
+        }
+    );
+}
+
+function memorizePosition(pos) {
+    set('current-book-position', pos);
+}
 
 function showPercent(p) {
     progressBlock.style.setProperty('--percent', p + '%');
@@ -189,7 +235,9 @@ function updateFooter() {
         String(bookPosition?.getTotalPages() ?? 0);
     document.getElementById('curPage').innerText =
         String((bookPosition?.getCurrentPage()  ?? 0) + (bookPosition ? 1 : 0));
-    showPercent(bookPosition?.getCurrentPercent().toFixed(1) ?? 0);
+    const currentPercent = bookPosition?.getCurrentPercent() ?? 0;
+    showPercent(currentPercent?.toFixed(1) ?? 0);
+    memorizePosition(currentPercent);
 }
 
 function pageControl(e) {

@@ -127,7 +127,7 @@ function parseAuthor(author) {
 
 /**
  * @typedef {object} Fb2Meta
- * @property {Element} annotation
+ * @property {string} annotationHtml
  * @property {number} sequenceNumber
  * @property {string} title
  * @property {string} sequenceName
@@ -147,7 +147,7 @@ function getMeta(xml) {
     const sequenceName = sequence?.attributes.name?.value;
     const sequenceNumber = sequence?.attributes.number?.value;
 
-    return { title, authors, annotation, sequenceName, sequenceNumber };
+    return { title, authors, annotationHtml: annotation.innerHTML, sequenceName, sequenceNumber };
 }
 
 /**
