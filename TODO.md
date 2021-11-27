@@ -18,4 +18,4 @@
 * show time & battery (if available) - when in full screen
 
 ## Known issues
-* percent positioning misses a spread by one
+* ~~percent positioning misses a spread by one~~

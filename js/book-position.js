@@ -109,7 +109,8 @@ class BookPosition {
     }
 
     _getElementLeftPosition(el) {
-        const elLeft = el.getBoundingClientRect().left;
+        const { left, width } = el.getBoundingClientRect();
+        const elLeft = Math.round(left + width / 2);
 
         return elLeft - this._bookSpreadLeftPos + this._htmlBook.scrollLeft;
     }
