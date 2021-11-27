@@ -1,4 +1,4 @@
-import { set, get } from './idb-keyval.js';
+import { set, delMany, getMany } from './idb-keyval.js';
 import processFile from './process-fb2.js';
 import BookPosition from './book-position.js';
 
@@ -113,6 +113,7 @@ function bookCleanup(full = false) {
         fEl.style.visibility = 'visible';
         topInfoBlock.innerHTML = '';
         fEl.value = '';
+        delMany(['current-book', 'current-book-position']);
     }
 }
 
@@ -172,8 +173,7 @@ let finalizeBookTo = null;
 let bookResizeObserver = null;
 
 async function preloadSavedFile() {
-    const currentBook = await get('current-book');
-    const currentBookPosition = await get('current-book-position');
+    const [currentBook, currentBookPosition] = await getMany(['current-book', 'current-book-position']);
     if (currentBook) {
         const position = currentBookPosition != null ? parseFloat(currentBookPosition) : 0;
         showParsedFile([currentBook.meta, currentBook.htmlBook], position);
