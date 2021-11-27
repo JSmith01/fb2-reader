@@ -138,8 +138,9 @@ function handleInternalLinks(e) {
     }
 }
 
-backLinkBtn.addEventListener('click', e => {
+function goBack(e) {
     absorb(e);
+
     if (!bookPosition || internalLinksPath.length === 0) return;
     const backRef = internalLinksPath.pop();
     if (backRef instanceof HTMLElement || typeof backRef === 'string') {
@@ -148,7 +149,9 @@ backLinkBtn.addEventListener('click', e => {
         bp.goToPercent(backRef);
     }
     updateFooter();
-});
+}
+
+backLinkBtn.addEventListener('click', goBack);
 
 function navigateByClick(e) {
     absorb(e);
@@ -250,10 +253,13 @@ function pageControl(e) {
     }
 
     switch (e.key) {
+        case 'ArrowLeft':
         case 'PageUp': return go(-1);
         case ' ':
+        case 'ArrowRight':
         case 'PageDown': return go(1);
         case 'Home': return go(-Infinity);
         case 'End': return go(+Infinity);
+        case 'Backspace': return goBack(e);
     }
 }
