@@ -1,3 +1,77 @@
+html {
+    font-size: 18px;
+    line-height: 32px;
+}
+body {
+    font-family: serif;
+    font-size: 1rem;
+    line-height: 1.7777778rem;
+}
+h1, h2, h3, h4, h5, h6 {
+    font-weight: bold;
+    text-decoration: none;
+    text-align: left;
+}
+h1 {
+    font-size: 3.3888889rem;
+    line-height: 3.5555556rem;
+    margin-top: 1.7777778rem;
+    margin-bottom: 3.5555556rem;
+}
+h2 {
+    font-size: 2.2777778rem;
+    line-height: 3.5555556rem;
+    margin-top: 1.7777778rem;
+    margin-bottom: 1.7777778rem;
+}
+h3 {
+    font-size: 1.5rem;
+    line-height: 1.7777778rem;
+    margin-top: 1.7777778rem;
+    margin-bottom: 0;
+}
+h4 {
+    font-size: 1rem;
+    line-height: 1.7777778rem;
+    margin-top: 1.7777778rem;
+    margin-bottom: 0;
+}
+h5, h6 {
+    font-size: 1rem;
+    line-height: 1.7777778rem;
+    margin-top: 1.7777778rem;
+    margin-bottom: 0;
+}
+h6 {
+    font-weight: normal;
+}
+p, ul, ol, pre, table, blockquote {
+    margin-top: 0;
+    margin-bottom: 1.7777778rem;
+}
+ul ul, ol ol, ul ol, ol ul {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+hr {
+    border: 1px solid;
+    margin: -1px 0;
+}
+a, b, i, strong, em, small, code {
+    line-height: 0;
+}
+sub, sup {
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
+}
+sup {
+    top: -0.5em;
+}
+sub {
+    bottom: -0.25em;
+}
+
 :root, body.light {
     --body-background: beige;
     --body-color: #111;
@@ -50,8 +124,6 @@ a:hover {
 .book-wrapper section,
 .book-wrapper p,
 .book-wrapper p {
-    font-size: 18px;
-    line-height: 1.5;
     text-align: justify;
 }
 .image-block {
@@ -74,7 +146,6 @@ input#f {
     width: 22px;
     height: 22px;
     text-align: center;
-    font-size: 18px;
     padding: 0;
     line-height: 21px;
     border-radius: 50%;

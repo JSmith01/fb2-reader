@@ -9,7 +9,7 @@
 * ~~dark/night mode~~
 * ~~bookmark current place (localStorage? IDB?)~~
 * ~~books saving (IDB)~~
-* vertical rhythm + proper book styling
+* ~~vertical rhythm~~ + proper book styling
 * font size selection
 * UI design
 * error handling
