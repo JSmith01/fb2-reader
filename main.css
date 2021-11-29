@@ -1,45 +1,50 @@
+:root {
+    --base-font: 18px;
+    --base-lh: 32px;
+    --base-size: 1.7777778rem;
+    --double-base-size: 3.5555556rem;
+}
 html {
-    font-size: 18px;
-    line-height: 32px;
+    font-size: var(--base-font);
+    line-height: var(--base-lh);
 }
 body {
     font-family: serif;
     font-size: 1rem;
-    line-height: 1.7777778rem;
+    line-height: var(--base-size);
 }
 h1, h2, h3, h4, h5, h6 {
     font-weight: bold;
+    font-style: normal;
     text-decoration: none;
-    text-align: left;
 }
 h1 {
     font-size: 3.3888889rem;
-    line-height: 3.5555556rem;
-    margin-top: 1.7777778rem;
-    margin-bottom: 3.5555556rem;
+    line-height: var(--double-base-size);
+    margin: var(--base-size) 0;
 }
 h2 {
     font-size: 2.2777778rem;
-    line-height: 3.5555556rem;
-    margin-top: 1.7777778rem;
-    margin-bottom: 1.7777778rem;
+    line-height: var(--double-base-size);
+    margin-top: var(--base-size);
+    margin-bottom: var(--base-size);
 }
 h3 {
     font-size: 1.5rem;
-    line-height: 1.7777778rem;
-    margin-top: 1.7777778rem;
+    line-height: var(--base-size);
+    margin-top: var(--base-size);
     margin-bottom: 0;
 }
 h4 {
     font-size: 1rem;
-    line-height: 1.7777778rem;
-    margin-top: 1.7777778rem;
+    line-height: var(--base-size);
+    margin-top: var(--base-size);
     margin-bottom: 0;
 }
 h5, h6 {
     font-size: 1rem;
-    line-height: 1.7777778rem;
-    margin-top: 1.7777778rem;
+    line-height: var(--base-size);
+    margin-top: var(--base-size);
     margin-bottom: 0;
 }
 h6 {
@@ -47,7 +52,7 @@ h6 {
 }
 p, ul, ol, pre, table, blockquote {
     margin-top: 0;
-    margin-bottom: 1.7777778rem;
+    margin-bottom: var(--base-size);
 }
 ul ul, ol ol, ul ol, ol ul {
     margin-top: 0;
@@ -70,6 +75,68 @@ sup {
 }
 sub {
     bottom: -0.25em;
+}
+/* FB2-specific styling */
+p.p {
+    text-indent: 2ch;
+}
+ul.section-toc {}
+h5.subtitle {}
+div.epigraph {
+    margin-left: 30%;
+    margin-bottom: var(--base-size);
+}
+div.epigraph p {
+    margin-top: 0;
+    margin-bottom: 0;
+    text-indent: 0;
+}
+div.epigraph-author {
+    font-style: italic;
+}
+div.cite {}
+div.cite-author {
+    font-style: italic;
+}
+div.fb-date {
+    font-style: italic;
+    font-weight: bold;
+}
+blockquote.poem {
+    margin-left: 4ch;
+    margin-right: 4ch;
+}
+div.stanza {
+    margin: var(--base-size) 0;
+}
+div.stanza-v {}
+div.image-block {
+    text-align: center;
+    break-inside: avoid-column;
+    page-break-inside: avoid;
+}
+div.image-block img {
+    object-fit: contain;
+    width: 80%;
+    max-height: 70vh;
+}
+p.sequence {}
+div.annotation {}
+div.toc {}
+div.book-content {}
+main.book-wrapper section,
+main.book-wrapper p,
+main.book-wrapper p {
+    text-align: justify;
+}
+
+/* UI specific parts */
+main.book-wrapper {
+    columns: 2;
+    height: 100%;
+    overflow-y: hidden;
+    overflow-x: hidden;
+    column-gap: 20px;
 }
 
 :root, body.light {
@@ -113,28 +180,6 @@ a {
 }
 a:hover {
     text-decoration: underline;
-}
-.book-wrapper {
-    columns: 2;
-    height: 100%;
-    overflow-y: hidden;
-    overflow-x: hidden;
-    column-gap: 20px;
-}
-.book-wrapper section,
-.book-wrapper p,
-.book-wrapper p {
-    text-align: justify;
-}
-.image-block {
-    text-align: center;
-    break-inside: avoid-column;
-    page-break-inside: avoid;
-}
-.image-block img {
-    object-fit: contain;
-    width: 80%;
-    max-height: 70vh;
 }
 input#f {
     z-index: 7;

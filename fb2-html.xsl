@@ -111,7 +111,7 @@
 
     <!-- title/p and the like -->
     <xsl:template match="fb:title/fb:p|fb:title-info/fb:book-title">
-        <p><xsl:apply-templates/></p>
+        <span><xsl:apply-templates/></span>
     </xsl:template>
 
 
@@ -126,7 +126,7 @@
 
     <!-- p -->
     <xsl:template match="fb:p">
-        <p><xsl:call-template name="preexisting_id"/>&#160;&#160;&#160;<xsl:apply-templates/></p>
+        <p class="p"><xsl:call-template name="preexisting_id"/><xsl:apply-templates/></p>
     </xsl:template>
 
     <!-- strong -->
@@ -185,8 +185,6 @@
             <xsl:call-template name="preexisting_id"/>
             <xsl:apply-templates/>
         </div>
-        <xsl:if test="name(./following-sibling::node()) = 'epigraph'"><br/></xsl:if>
-        <br/>
     </xsl:template>
 
     <!-- epigraph/text-author -->
@@ -204,26 +202,24 @@
 
     <!-- cite/text-author -->
     <xsl:template match="fb:text-author">
-        <blockquote><i><xsl:apply-templates/></i></blockquote>
+        <blockquote class="cite-author"><i><xsl:apply-templates/></i></blockquote>
     </xsl:template>
 
     <!-- date -->
     <xsl:template match="fb:date">
         <xsl:choose>
             <xsl:when test="not(@value)">
-                &#160;&#160;&#160;<xsl:apply-templates/>
-                <br/>
+                <div class="fb-date"><xsl:apply-templates/></div>
             </xsl:when>
             <xsl:otherwise>
-                &#160;&#160;&#160;<xsl:value-of select="@value"/>
-                <br/>
+                <div class="fb-date"><xsl:value-of select="@value"/></div>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
 
     <!-- poem -->
     <xsl:template match="fb:poem">
-        <blockquote>
+        <blockquote class="poem">
             <xsl:call-template name="preexisting_id"/>
             <xsl:apply-templates/>
         </blockquote>
@@ -231,15 +227,17 @@
 
     <!-- stanza -->
     <xsl:template match="fb:stanza">
-        &#160;<br/>
-        <xsl:apply-templates/>
-        &#160;<br/>
+        <div class="stanza">
+            <xsl:apply-templates/>
+        </div>
     </xsl:template>
 
     <!-- v -->
     <xsl:template match="fb:v">
         <xsl:call-template name="preexisting_id"/>
-        <xsl:apply-templates/><br/>
+        <div class="stanza-v">
+            <xsl:apply-templates/>
+        </div>
     </xsl:template>
 
     <!-- image - inline -->
