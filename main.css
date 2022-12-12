@@ -1,5 +1,5 @@
 :root {
-    --base-font: 18px;
+    --base-font: 20px;
     --base-lh: 32px;
     --base-size: 1.7777778rem;
     --double-base-size: 3.5555556rem;
@@ -136,7 +136,7 @@ main.book-wrapper {
     height: 100%;
     overflow-y: hidden;
     overflow-x: hidden;
-    column-gap: 20px;
+    column-gap: 40px;
 }
 
 :root, body.light {

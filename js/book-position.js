@@ -10,7 +10,7 @@ class BookPosition {
     _bookSpreadLeftPos = 0;
 
     /** @private */
-    _gap = 20;
+    _gap = 40;
 
     /**
      * @type {HTMLElement}
