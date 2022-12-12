@@ -2,18 +2,11 @@ import { set, delMany, getMany } from './idb-keyval.js';
 import processFile from './process-fb2.js';
 import BookPosition from './book-position.js';
 
-const LS_KEY_THEME = 'theme';
-const THEME_LIGHT = 'light';
-const THEME_DARK = 'dark';
-const THEME_OS = '';
-
 const fEl = document.getElementById('f');
 const bookEl = document.getElementById('book');
 const topInfoTrigger = document.getElementById('top-book-info-trigger');
 const closeBookBtn = document.getElementById('close-book');
 const backLinkBtn = document.getElementById('back-link');
-const lightThemeBtn = document.getElementById('light-theme');
-const darkThemeBtn = document.getElementById('dark-theme');
 const topInfoBlock = document.getElementById('top-book-info');
 const progressBlock = document.getElementById('progress');
 
@@ -21,55 +14,6 @@ function absorb(e) {
     e.preventDefault();
     e.stopPropagation();
 }
-
-let themeActive = THEME_OS;
-const setThemeActive = valOrCb => {
-    themeActive = typeof valOrCb === 'function' ? valOrCb(themeActive) : valOrCb;
-    localStorage.setItem(LS_KEY_THEME, themeActive);
-    syncThemeUi();
-}
-
-setThemeActive(localStorage[LS_KEY_THEME] ?? THEME_OS);
-
-function syncThemeUi() {
-    const ACTIVE = 'active';
-
-    switch (themeActive) {
-        case THEME_OS: {
-            document.body.classList.remove(THEME_LIGHT);
-            document.body.classList.remove(THEME_DARK);
-            lightThemeBtn.classList.remove(ACTIVE);
-            darkThemeBtn.classList.remove(ACTIVE);
-            break;
-        }
-        case THEME_LIGHT: {
-            document.body.classList.add(THEME_LIGHT);
-            document.body.classList.remove(THEME_DARK);
-            lightThemeBtn.classList.add(ACTIVE);
-            darkThemeBtn.classList.remove(ACTIVE);
-            break;
-        }
-        case THEME_DARK: {
-            document.body.classList.remove(THEME_LIGHT);
-            document.body.classList.add(THEME_DARK);
-            lightThemeBtn.classList.remove(ACTIVE);
-            darkThemeBtn.classList.add(ACTIVE);
-            break;
-        }
-    }
-}
-
-syncThemeUi();
-
-lightThemeBtn.addEventListener('click', e => {
-    absorb(e);
-    setThemeActive(themeActive => themeActive === THEME_LIGHT ? THEME_OS : THEME_LIGHT);
-});
-
-darkThemeBtn.addEventListener('click', e => {
-    absorb(e);
-    setThemeActive(themeActive => themeActive === THEME_DARK ? THEME_OS : THEME_DARK);
-});
 
 preloadSavedFile();
 

@@ -260,11 +260,8 @@ footer {
     top: 0;
     bottom: 20px;
 }
-.theme-selector {
+theme-selector {
     position: absolute;
     top: 50px;
     right: 10px;
-}
-.theme-selector button.active {
-    background: lightblue;
 }

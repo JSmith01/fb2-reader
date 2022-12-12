@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="main.css">
 </head>
 <body>
-<script>try {localStorage.theme && document.body.classList.add(localStorage.theme)} catch(e){console.error(e)}</script>
+<script src="js/components/theme-selector.js"></script>
 <footer id="progress">Page <span id="curPage">0</span> of <span id="totalPages">0</span> (<span id="curPercent">0</span>%)</footer>
 <input type="file" accept=".fb2, .zip" id="f">
 <div id="book"></div>
@@ -18,10 +18,7 @@
     <div id="top-book-info"></div>
     <button id="close-book" class="ui-btn" title="close the file">&times;</button>
     <button id="back-link" class="ui-btn-big" title="return back">&larr;</button>
-    <div class="theme-selector">
-        <button id="light-theme" class="ui-btn-big" title="light theme">☀</button>
-        <button id="dark-theme" class="ui-btn-big" title="dark theme">🌙</button>
-    </div>
+    <theme-selector></theme-selector>
 </div>
 
 <script type="module" src="js/main.js"></script>
