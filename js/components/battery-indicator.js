@@ -4,7 +4,7 @@ const BATTERY_INDICATOR_STYLES = `
     display: inline-block;
     position: absolute;
     pointer-events: none;
-    right: 0;
+    right: 5px;
     font-size: 14px;
 }
 `;
