@@ -10,7 +10,11 @@
 </head>
 <body>
 <script src="js/components/theme-selector.js"></script>
-<footer id="progress">Page <span id="curPage">0</span> of <span id="totalPages">0</span> (<span id="curPercent">0</span>%)</footer>
+<script src="js/components/battery-indicator.js"></script>
+<footer id="progress">
+    Page <span id="curPage">0</span> of <span id="totalPages">0</span> (<span id="curPercent">0</span>%)
+    <battery-indicator></battery-indicator>
+</footer>
 <input type="file" accept=".fb2, .zip" id="f">
 <div id="book"></div>
 <div class="book-info-trigger" id="top-book-info-trigger"></div>
