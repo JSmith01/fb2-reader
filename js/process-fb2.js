@@ -1,7 +1,7 @@
-import { unzip, setOptions } from './unzipit.module.js';
+import { unzip, setOptions } from './thirdparty/unzipit.module.js';
 
 setOptions({
-    workerURL: '/js/unzipit-worker.module.js',
+    workerURL: '/js/thirdparty/unzipit-worker.module.js',
     numWorkers: 2,
 });
 

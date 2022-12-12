@@ -7,3 +7,7 @@ Ideally it should work completely offline.
 
 Reader is partially based on XSL derived from [fb2any](https://github.com/gribuser/fb2any)
 tool by [gribuser](https://github.com/gribuser).
+
+Project uses [idb-keyval](https://github.com/jakearchibald/idb-keyval), and
+[unzipit](https://github.com/greggman/unzipit) - both included into the project,
+located in `/js/thirdparty` directory.

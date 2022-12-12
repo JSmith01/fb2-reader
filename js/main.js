@@ -1,4 +1,4 @@
-import { set, delMany, getMany } from './idb-keyval.js';
+import { set, delMany, getMany } from './thirdparty/idb-keyval.js';
 import processFile from './process-fb2.js';
 import BookPosition from './book-position.js';
 
