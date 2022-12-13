@@ -7,7 +7,7 @@ const BATTERY_INDICATOR_STYLES = `
 }
 `;
 
-class BatteryIndicator extends HTMLElement {
+export default class BatteryIndicator extends HTMLElement {
     constructor() {
         super();
         const style = document.createElement('style');
@@ -49,5 +49,3 @@ class BatteryIndicator extends HTMLElement {
         });
     }
 }
-
-customElements.define('battery-indicator', BatteryIndicator);

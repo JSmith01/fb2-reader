@@ -15,7 +15,7 @@ const CLOCK_STYLES = `
 }
 `;
 
-class ClockIndicator extends HTMLElement {
+export default class ClockIndicator extends HTMLElement {
     constructor() {
         super();
         const style = document.createElement('style');
@@ -43,5 +43,3 @@ class ClockIndicator extends HTMLElement {
         clearInterval(this._timer);
     }
 }
-
-customElements.define('clock-indicator', ClockIndicator);

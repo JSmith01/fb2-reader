@@ -57,7 +57,7 @@ button.active {
 }
 `;
 
-class ThemeSelector extends HTMLElement {
+export default class ThemeSelector extends HTMLElement {
     constructor() {
         super();
         const style = document.createElement('style');
@@ -100,5 +100,3 @@ class ThemeSelector extends HTMLElement {
         });
     }
 }
-
-customElements.define('theme-selector', ThemeSelector);
