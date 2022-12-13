@@ -17,16 +17,18 @@ export default class BatteryIndicator extends HTMLElement {
         shadowRoot.appendChild(style);
         shadowRoot.appendChild(block);
         style.textContent = BATTERY_INDICATOR_STYLES;
+    }
 
+    connectedCallback() {
         if (!'getBattery' in navigator || typeof navigator.getBattery !== 'function') return;
 
         this._batteryPromise = navigator.getBattery().then(batteryManager => {
-                this._batteryManager = batteryManager;
-                batteryManager.onlevelchange = this.updateContent;
-                batteryManager.onchargingchange = this.updateContent;
-                this.updateContent();
-                document.addEventListener('visibilitychange', this.updateContent);
-            });
+            this._batteryManager = batteryManager;
+            batteryManager.onlevelchange = this.updateContent;
+            batteryManager.onchargingchange = this.updateContent;
+            this.updateContent();
+            document.addEventListener('visibilitychange', this.updateContent);
+        });
     }
 
     updateContent = () => {
@@ -45,6 +47,7 @@ export default class BatteryIndicator extends HTMLElement {
             this._batteryManager.onlevelchange = null;
             this._batteryManager.onchargingchange = null;
             this._batteryManager = null;
+            this._batteryPromise = null;
             document.removeEventListener('visibilitychange', this.updateContent);
         });
     }
