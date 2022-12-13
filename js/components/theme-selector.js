@@ -38,6 +38,11 @@ function syncThemeUi() {
 }
 
 const THEME_SELECTOR_STYLES = `
+:host {
+    position: absolute;
+    top: 50px;
+    right: 10px;
+}
 .ui-btn-big {
     width: 30px;
     height: 30px;
@@ -53,8 +58,8 @@ button.active {
 `;
 
 class ThemeSelector extends HTMLElement {
-    constructor(props) {
-        super(props);
+    constructor() {
+        super();
         const style = document.createElement('style');
         const block = document.createElement('div');
         block.className = 'theme-selector';

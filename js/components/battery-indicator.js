@@ -2,16 +2,14 @@ const BATTERY_INDICATOR_STYLES = `
 :host {
     line-height: 35px;
     display: inline-block;
-    position: absolute;
     pointer-events: none;
-    right: 5px;
     font-size: 14px;
 }
 `;
 
 class BatteryIndicator extends HTMLElement {
-    constructor(props) {
-        super(props);
+    constructor() {
+        super();
         const style = document.createElement('style');
         const block = document.createElement('span');
 
