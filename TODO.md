@@ -11,8 +11,9 @@
 * ~~books saving (IDB)~~
 * ~~vertical rhythm~~ + proper book styling
 * font size selection
-* UI design
+* UI design (hints or tooltips for shortcuts; a11y maybe?)
 * error handling
 * switch to single column using media query
 * ~~service worker for offline mode~~
 * ~~show time & battery (if available) - when in full screen~~
+* set page title according to opened book
