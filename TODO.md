@@ -14,5 +14,5 @@
 * UI design
 * error handling
 * switch to single column using media query
-* service worker for offline mode
+* ~~service worker for offline mode~~
 * ~~show time & battery (if available) - when in full screen~~
