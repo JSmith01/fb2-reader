@@ -10,7 +10,7 @@
 * ~~bookmark current place (localStorage? IDB?)~~
 * ~~books saving (IDB)~~
 * ~~vertical rhythm~~ + proper book styling
-* font size selection
+* ~~font size selection~~
 * UI design (hints or tooltips for shortcuts; a11y maybe?)
 * error handling
 * switch to single column using media query

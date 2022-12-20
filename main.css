@@ -1,8 +1,8 @@
 :root {
     --base-font: 20px;
-    --base-lh: 32px;
+    --base-lh: calc(var(--base-font) * 1.6);
     --base-size: 1.7777778rem;
-    --double-base-size: 3.5555556rem;
+    --double-base-size: calc(var(--base-size) * 2);
 }
 html {
     font-size: var(--base-font);
@@ -14,23 +14,24 @@ body {
     line-height: var(--base-size);
 }
 h1, h2, h3, h4, h5, h6 {
+    font-family: sans-serif;
     font-weight: bold;
     font-style: normal;
     text-decoration: none;
 }
 h1 {
-    font-size: 3.3888889rem;
+    font-size: 2.2777778rem;
     line-height: var(--double-base-size);
     margin: var(--base-size) 0;
 }
 h2 {
-    font-size: 2.2777778rem;
+    font-size: 1.5rem;
     line-height: var(--double-base-size);
     margin-top: var(--base-size);
     margin-bottom: var(--base-size);
 }
 h3 {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     line-height: var(--base-size);
     margin-top: var(--base-size);
     margin-bottom: 0;
@@ -248,7 +249,7 @@ footer {
             rgba(0,0,0,0.05) var(--percent),
             rgba(0,0,0,0.05) 100%
     );
-    font-size: 12px;
+    font-size: 14px;
     cursor: pointer;
     z-index: 3;
 }

@@ -1,3 +1,5 @@
+import { addListener } from './utils.js';
+
 const LS_KEY_THEME = 'theme';
 const THEME_LIGHT = 'light';
 const THEME_DARK = 'dark';
@@ -71,12 +73,12 @@ export default class ThemeSelector extends HTMLElement {
 
         const btnLight = document.createElement('button');
         btnLight.textContent = '☀';
-        btnLight.title = 'light theme'
+        btnLight.title = 'Light Theme'
         btnLight.className = 'ui-btn-big' + (themeActive === THEME_LIGHT ? (' ' + ACTIVE) : '');
 
         const btnDark = document.createElement('button');
         btnDark.textContent = '🌙';
-        btnDark.title = 'dark theme';
+        btnDark.title = 'Dark Theme';
         btnDark.className = 'ui-btn-big' + (themeActive === THEME_DARK ? (' ' + ACTIVE) : '');
         block.append(btnLight, btnDark);
 
@@ -85,16 +87,12 @@ export default class ThemeSelector extends HTMLElement {
             btnDark.classList[theme === THEME_DARK ? 'add' : 'remove'](ACTIVE);
         }
 
-        btnLight.addEventListener('click', e => {
-            e.preventDefault();
-            e.stopPropagation();
+        addListener(btnLight, () => {
             const theme = setThemeActive(themeActive => themeActive === THEME_LIGHT ? THEME_OS : THEME_LIGHT);
             syncButtons(theme);
         });
 
-        btnDark.addEventListener('click', e => {
-            e.preventDefault();
-            e.stopPropagation();
+        addListener(btnDark, () => {
             const theme = setThemeActive(themeActive => themeActive === THEME_DARK ? THEME_OS : THEME_DARK);
             syncButtons(theme);
         });
