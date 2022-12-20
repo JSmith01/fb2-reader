@@ -17,3 +17,6 @@
 * ~~service worker for offline mode~~
 * ~~show time & battery (if available) - when in full screen~~
 * set page title according to opened book
+
+## Issues
+* font size change doesn't affect pages count/position/etc
