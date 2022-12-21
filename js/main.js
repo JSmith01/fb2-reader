@@ -45,6 +45,8 @@ function bookCleanup(full = false) {
     }
     bookResizeObserver?.disconnect();
     bookResizeObserver = null;
+    fontChangeObserver?.disconnect();
+    fontChangeObserver = null;
     window.removeEventListener('keyup', pageControl);
     bookPosition = null;
     updateFooter();
@@ -115,6 +117,8 @@ let bookPosition = null;
 let finalizeBookTo = null;
 /** @type {ResizeObserver} */
 let bookResizeObserver = null;
+/** @type {MutationObserver} */
+let fontChangeObserver = null;
 
 async function preloadSavedFile() {
     const [currentBook, currentBookPosition] = await getMany(['current-book', 'current-book-position']);
@@ -149,11 +153,14 @@ function showParsedFile([meta, htmlBook], initialPosition = 0) {
         if (initialPosition > 0) {
             bookPosition.goToPercent(initialPosition);
         }
-        bookResizeObserver = new ResizeObserver(() => {
+        const domChangeObserver = () => {
             bookPosition.handleDomChanges();
             updateFooter();
-        });
+        };
+        bookResizeObserver = new ResizeObserver(domChangeObserver);
         bookResizeObserver.observe(actualHtmlBook);
+        fontChangeObserver = new MutationObserver(domChangeObserver);
+        fontChangeObserver.observe(document.documentElement, { attributes: true })
         finalizeBookTo = null;
     }, 20);
 }
