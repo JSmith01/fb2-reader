@@ -16,6 +16,7 @@ const urlsToCache = [
     'js/components/battery-indicator.js',
     'js/components/clock-indicator.js',
     'js/components/theme-selector.js',
+    'js/components/font-selector.js',
 ];
 
 // Install a service worker
