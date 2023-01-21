@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fb2-reader-v0.0.3';
+const CACHE_NAME = 'fb2-reader-v0.0.4';
 
 const urlsToCache = [
     './',

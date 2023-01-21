@@ -28,11 +28,15 @@ class BookPosition {
     _bookSpreads = 0;
 
     /** @private */
-    _pagesPerSpread = 2;
+    _pagesPerSpread;
 
-    constructor(htmlBook, pagesPerSpread = 2) {
+    constructor(htmlBook) {
         this._htmlBook = htmlBook;
-        this._pagesPerSpread = pagesPerSpread || 2;
+        this.fetchPagesPerSpread();
+    }
+
+    fetchPagesPerSpread() {
+        this._pagesPerSpread = parseInt(window.getComputedStyle(this._htmlBook).columnCount);
     }
 
     getCurrentPage() {
@@ -59,6 +63,7 @@ class BookPosition {
         const boundingRect = this._htmlBook.getBoundingClientRect();
         this._bookSpreadSize = boundingRect.width;
         this._bookSpreadLeftPos = boundingRect.left;
+        this.fetchPagesPerSpread();
         const gapFromStyle = parseInt(window.getComputedStyle(this._htmlBook).columnGap);
         if (gapFromStyle > 0) this._gap = gapFromStyle;
     }
