@@ -2,6 +2,8 @@ import { set, delMany, getMany } from './thirdparty/idb-keyval.js';
 import processFile from './process-fb2.js';
 import BookPosition from './book-position.js';
 
+const Fb2ReaderTitle = 'FB2 Reader';
+
 const fEl = document.getElementById('f');
 const bookEl = document.getElementById('book');
 const topInfoTrigger = document.getElementById('top-book-info-trigger');
@@ -28,12 +30,14 @@ bookEl.addEventListener('drop', e => {
 });
 
 function showBookInfo(meta) {
+    const authors = meta.authors.join(', ');
     topInfoTrigger.style.display = 'block';
     topInfoBlock.innerHTML = `
-<div>Author${meta.authors.length > 1 ? 's' : ''}: ${meta.authors.join(', ')}</div>
+<div>Author${meta.authors.length > 1 ? 's' : ''}: ${authors}</div>
 <div>Title: ${meta.title}</div>
 ${meta.sequenceName ? `<div>Series: ${meta.sequenceName}, #${meta.sequenceNumber}</div>` : ''}
 <div class="book-annotation">${meta.annotationHtml}</div>`;
+    document.title = `${meta.title} - ${authors} / ${Fb2ReaderTitle}`;
 }
 
 function bookCleanup(full = false) {
@@ -61,6 +65,7 @@ function bookCleanup(full = false) {
         fEl.value = '';
         delMany(['current-book', 'current-book-position']);
     }
+    document.title = Fb2ReaderTitle;
 }
 
 closeBookBtn.addEventListener('click', () => bookCleanup(true));

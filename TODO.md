@@ -2,10 +2,10 @@
 
 * E2E regression tests
 * touch interface (at least prev/next pages)
-* set page title according to opened book
 * error handling
 * add navigation window with table of contents
 * UI design (hints or tooltips for shortcuts; a11y maybe?)
+* ~~set page title according to opened book~~
 * ~~switch to single column using media query~~
 * ~~proper book styling~~
 * ~~resize observer with percent saving~~

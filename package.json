@@ -1,6 +1,6 @@
 {
   "name": "fb2-reader",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "license": "MIT",
   "author": "Dmitry Zlygin <dzlygin@gmail.com>",
   "dependencies": {
