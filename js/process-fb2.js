@@ -147,7 +147,7 @@ function getMeta(xml) {
     const sequenceName = sequence?.attributes.name?.value;
     const sequenceNumber = sequence?.attributes.number?.value;
 
-    return { title, authors, annotationHtml: annotation.innerHTML, sequenceName, sequenceNumber };
+    return { title, authors, annotationHtml: annotation?.innerHTML ?? '', sequenceName, sequenceNumber };
 }
 
 /**
