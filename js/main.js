@@ -9,6 +9,7 @@ const bookEl = document.getElementById('book');
 const topInfoTrigger = document.getElementById('top-book-info-trigger');
 const closeBookBtn = document.getElementById('close-book');
 const backLinkBtn = document.getElementById('back-link');
+const bookInfoBlock = document.getElementById('book-info-block');
 const topInfoBlock = document.getElementById('top-book-info');
 const progressBlock = document.getElementById('progress');
 
@@ -31,6 +32,7 @@ bookEl.addEventListener('drop', e => {
 
 function showBookInfo(meta) {
     const authors = meta.authors.join(', ');
+    bookInfoBlock.classList.remove('disabled');
     topInfoTrigger.style.display = 'block';
     topInfoBlock.innerHTML = `
 <div>Author${meta.authors.length > 1 ? 's' : ''}: ${authors}</div>
@@ -65,6 +67,7 @@ function bookCleanup(full = false) {
         fEl.value = '';
         delMany(['current-book', 'current-book-position']);
     }
+    bookInfoBlock.classList.add('disabled');
     document.title = Fb2ReaderTitle;
 }
 

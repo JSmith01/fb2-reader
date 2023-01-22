@@ -41,9 +41,11 @@ function syncThemeUi() {
 
 const THEME_SELECTOR_STYLES = `
 :host {
-    position: absolute;
-    top: 50px;
-    right: 10px;
+    display: inline-block;
+}
+div.theme-selector {
+    line-height: 30px;
+    height: 30px;
 }
 .ui-btn-big {
     width: 30px;
@@ -52,6 +54,7 @@ const THEME_SELECTOR_STYLES = `
     padding: 0;
     border-radius: 50%;
     line-height: 18px;
+    vertical-align: top;
 }
 
 button.active {

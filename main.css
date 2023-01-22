@@ -191,8 +191,9 @@ a:hover {
 input#f {
     z-index: 7;
     position: absolute;
-    top: 0;
-    left: 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 .ui-btn, .ui-btn-big {
     width: 22px;
@@ -207,14 +208,48 @@ input#f {
     width: 30px;
     height: 30px;
 }
-#close-book, #back-link {
+nav.book-controls #close-book {
     position: absolute;
     top: 10px;
     right: 10px;
 }
-#back-link {
-    top: 7px;
-    right: 40px;
+nav.book-controls #back-link {
+    position: absolute;
+    top: 10px;
+    right: 50px;
+}
+nav.book-controls font-selector {
+    position: absolute;
+    top: 50px;
+    right: 90px;
+}
+nav.book-controls theme-selector {
+    position: absolute;
+    top: 50px;
+    right: 10px;
+}
+@media screen and (max-width: 786px) {
+    nav.book-controls {
+        display: flex;
+        width: 100%;
+        position: relative;
+        height: 30px;
+        justify-content: space-evenly;
+        margin-bottom: 0.3rem;
+    }
+    nav.book-controls #close-book {
+        position: initial;
+        order: 4;
+    }
+    nav.book-controls #back-link {
+        position: initial;
+    }
+    nav.book-controls font-selector {
+        position: initial;
+    }
+    nav.book-controls theme-selector {
+        position: initial;
+    }
 }
 #top-book-info:empty + #close-book {
     display: none;
@@ -236,10 +271,23 @@ input#f {
     background: rgba(0, 0, 0, 0.8);
     padding: 10px;
     height: auto;
+    max-height: 80%;
+    overflow: hidden;
     color: white;
 }
 .book-info-trigger:hover + .book-info, .book-info:hover {
     display: block;
+}
+.book-info-trigger:hover + .book-info.disabled, .book-info.disabled:hover {
+    display: none;
+}
+.book-annotation {
+    font-size: 0.9rem;
+    margin-top: 1.2rem;
+    line-height: 1.2rem;
+}
+.book-annotation p {
+    margin-bottom: 0.6rem;
 }
 footer {
     position: absolute;

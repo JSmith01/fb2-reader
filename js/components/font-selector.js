@@ -18,9 +18,11 @@ if (currentFontSize !== initialFontSize)  {
 
 const FONT_SELECTOR_STYLES = `
 :host {
-    position: absolute;
-    top: 50px;
-    right: 90px;
+    display: inline-block;
+}
+div.font-selector {
+    line-height: 30px;
+    height: 30px;
 }
 button {
     width: 30px;
@@ -29,6 +31,7 @@ button {
     padding: 0;
     border-radius: 0;
     line-height: 18px;
+    vertical-align: top;
 }
 button:first-child {
     border-radius: 50% 0 0 50%;
@@ -43,7 +46,7 @@ export default class FontSelector extends HTMLElement {
         super();
         const style = document.createElement('style');
         const block = document.createElement('div');
-        block.className = 'theme-selector';
+        block.className = 'font-selector';
 
         const shadowRoot = this.attachShadow({ mode: 'open' });
         shadowRoot.appendChild(style);
