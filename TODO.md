@@ -21,3 +21,4 @@
 * ~~font size selection~~
 * ~~service worker for offline mode~~
 * ~~show time & battery (if available) - when in full screen~~
+* single column mode is broken in Safari - text is vertically aligned (not horizontally)
