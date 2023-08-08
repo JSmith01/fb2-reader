@@ -9,6 +9,7 @@ const urlsToCache = [
     'js/book-position.js',
     'js/main.js',
     'js/process-fb2.js',
+    'js/swipe.js',
     'js/thirdparty/idb-keyval.js',
     'js/thirdparty/unzipit.module.js',
     'js/thirdparty/unzipit-worker.module.js',
