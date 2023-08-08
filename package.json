@@ -1,11 +1,11 @@
 {
   "name": "fb2-reader",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "license": "MIT",
   "author": "Dmitry Zlygin <dzlygin@gmail.com>",
   "dependencies": {
     "idb-keyval": "^6.0.3",
-    "serve": "^13.0.2",
+    "serve": "^14.2.0",
     "unzipit": "^1.3.5"
   },
   "scripts": {

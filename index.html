@@ -34,7 +34,11 @@
 <script type="module" src="js/main.js"></script>
 <script>
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js');
+        if (location.hostname === 'localhost' && location.hash !== '#sw') {
+            console.log('no service worker for localhost unless #sw is used');
+        } else {
+            navigator.serviceWorker.register('sw.js');
+        }
     }
 </script>
 </body>

@@ -1,6 +1,7 @@
 import { set, delMany, getMany } from './thirdparty/idb-keyval.js';
 import processFile from './process-fb2.js';
 import BookPosition from './book-position.js';
+import { getSwipe } from './swipe.js';
 
 const Fb2ReaderTitle = 'FB2 Reader';
 
@@ -14,8 +15,8 @@ const topInfoBlock = document.getElementById('top-book-info');
 const progressBlock = document.getElementById('progress');
 
 function absorb(e) {
-    e.preventDefault();
-    e.stopPropagation();
+    e.preventDefault?.();
+    e.stopPropagation?.();
 }
 
 preloadSavedFile();
@@ -42,6 +43,8 @@ ${meta.sequenceName ? `<div>Series: ${meta.sequenceName}, #${meta.sequenceNumber
     document.title = `${meta.title} - ${authors} / ${Fb2ReaderTitle}`;
 }
 
+let swipeCleanup = null;
+
 function bookCleanup(full = false) {
     if (!bookPosition) return;
 
@@ -54,6 +57,8 @@ function bookCleanup(full = false) {
     fontChangeObserver?.disconnect();
     fontChangeObserver = null;
     window.removeEventListener('keyup', pageControl);
+    swipeCleanup?.();
+    swipeCleanup = null;
     bookPosition = null;
     updateFooter();
     internalLinksPath.length = 0;
@@ -155,6 +160,13 @@ function showParsedFile([meta, htmlBook], initialPosition = 0) {
     bookPosition = new BookPosition(actualHtmlBook);
     window.bp = bookPosition;
     window.addEventListener('keyup', pageControl);
+    swipeCleanup = getSwipe(bookEl, swipe => {
+        if (swipe === 'left') {
+            pageControl({ key: 'PageUp'});
+        } else if (swipe === 'right') {
+            pageControl({ key: 'PageDown'});
+        }
+    });
     finalizeBookTo = setTimeout(() => {
         bookPosition.calcPagination();
         updateFooter();
