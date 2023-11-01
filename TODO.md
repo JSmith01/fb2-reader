@@ -4,6 +4,7 @@
 * error handling
 * add the navigation window with table of contents
 * UI design (hints or tooltips for shortcuts; a11y maybe?)
+* ~~fullscreen button~~
 * ~~touch interface (at least prev/next pages)~~
 * ~~set page title according to opened book~~
 * ~~switch to single column using media query~~

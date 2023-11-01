@@ -181,6 +181,17 @@ body {
     background: var(--body-background, beige);
     color: var(--body-color, #111);
 }
+::backdrop, :fullscreen, body.light::backdrop, body.light:fullscreen {
+    background: var(--body-background, beige);
+}
+@media (prefers-color-scheme: dark) {
+    ::backdrop, :fullscreen {
+        background: var(--body-background, #2b2b2b);
+    }
+}
+body.dark::backdrop, body.dark:fullscreen {
+    background: var(--body-background, #2b2b2b);
+}
 a {
     color: var(--link-color, #2470B3);
     text-decoration: none;
@@ -218,10 +229,15 @@ nav.book-controls #back-link {
     top: 10px;
     right: 50px;
 }
+nav.book-controls fullscreen-button {
+    position: absolute;
+    top: 50px;
+    right: 80px;
+}
 nav.book-controls font-selector {
     position: absolute;
     top: 50px;
-    right: 90px;
+    right: 120px;
 }
 nav.book-controls theme-selector {
     position: absolute;
@@ -241,12 +257,9 @@ nav.book-controls theme-selector {
         position: initial;
         order: 4;
     }
-    nav.book-controls #back-link {
-        position: initial;
-    }
-    nav.book-controls font-selector {
-        position: initial;
-    }
+    nav.book-controls fullscreen-button,
+    nav.book-controls #back-link,
+    nav.book-controls font-selector,
     nav.book-controls theme-selector {
         position: initial;
     }
