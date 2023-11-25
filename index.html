@@ -18,7 +18,21 @@
         <battery-indicator></battery-indicator>
     </div>
 </footer>
-<input type="file" accept=".fb2, .zip" id="f">
+<div id="welcome">
+    <div><input type="file" accept=".fb2, .zip" id="f"></div>
+    <div><button class="open-shelf">open bookshelf</button></div>
+</div>
+<dialog id="bookshelf-manager">
+    <table>
+        <template class="shelf-row">
+            <tr><td></td><td><button>&times;</button></td></tr>
+        </template>
+        <template class="shelf-empty">
+            <tr><td colspan="2">No books on the bookshelf</td></tr>
+        </template>
+    </table>
+    <button class="close">Close bookshelf</button>
+</dialog>
 <div id="book"></div>
 <div class="book-info-trigger" id="top-book-info-trigger"></div>
 <div class="book-info disabled" id="book-info-block">

@@ -1,10 +1,13 @@
-import { set, delMany, getMany } from './thirdparty/idb-keyval.js';
+import { set, get, delMany, getMany } from './thirdparty/idb-keyval.js';
 import processFile from './process-fb2.js';
 import BookPosition from './book-position.js';
 import { getSwipe } from './swipe.js';
+import { absorb, digestMessage } from './utils.js';
+import { openBookshelf } from './bookshelf.js';
 
 const Fb2ReaderTitle = 'FB2 Reader';
 
+const welcomeEl = document.getElementById('welcome');
 const fEl = document.getElementById('f');
 const bookEl = document.getElementById('book');
 const topInfoTrigger = document.getElementById('top-book-info-trigger');
@@ -14,16 +17,16 @@ const bookInfoBlock = document.getElementById('book-info-block');
 const topInfoBlock = document.getElementById('top-book-info');
 const progressBlock = document.getElementById('progress');
 
-function absorb(e) {
-    e.preventDefault?.();
-    e.stopPropagation?.();
-}
 
 preloadSavedFile();
 
 fEl.addEventListener('change', () => {
     if (fEl.files.length > 0) handleFile(fEl.files[0]);
 });
+
+welcomeEl.querySelector('.open-shelf').onclick = () => {
+    openBookshelf(preloadSavedFile);
+}
 
 bookEl.addEventListener('dragover', absorb);
 bookEl.addEventListener('drop', e => {
@@ -52,6 +55,12 @@ function bookCleanup(full = false) {
         clearTimeout(finalizeBookTo);
         finalizeBookTo = null;
     }
+    if (full && confirm('Save current book to the bookshelf?')) {
+        const meta = { ...bookMeta };
+        meta.position = bookPosition.getCurrentPercent();
+        const bookContent = bookEl.innerHTML;
+        digestMessage(meta.fileName).then(key => saveFile([meta, bookContent], key));
+    }
     bookResizeObserver?.disconnect();
     bookResizeObserver = null;
     fontChangeObserver?.disconnect();
@@ -67,7 +76,7 @@ function bookCleanup(full = false) {
     }
     if (full) {
         topInfoTrigger.style.display = 'none';
-        fEl.style.visibility = 'visible';
+        welcomeEl.style.visibility = 'visible';
         topInfoBlock.innerHTML = '';
         fEl.value = '';
         delMany(['current-book', 'current-book-position']);
@@ -132,17 +141,35 @@ let finalizeBookTo = null;
 let bookResizeObserver = null;
 /** @type {MutationObserver} */
 let fontChangeObserver = null;
+let bookMeta;
 
-async function preloadSavedFile() {
-    const [currentBook, currentBookPosition] = await getMany(['current-book', 'current-book-position']);
+async function preloadSavedFile(key) {
+    let currentBook, currentBookPosition;
+    if (!key) {
+        [currentBook, currentBookPosition] = await getMany(['current-book', 'current-book-position']);
+    } else {
+        currentBook = await get(key);
+        currentBookPosition = currentBook.position;
+    }
     if (currentBook) {
         const position = currentBookPosition != null ? parseFloat(currentBookPosition) : 0;
         showParsedFile([currentBook.meta, currentBook.htmlBook], position);
     }
 }
 
-function saveFile([meta, htmlBook]) {
-    set('current-book', { meta, htmlBook: htmlBook.outerHTML });
+/**
+ * @param {object} meta
+ * @param {ChildNode} htmlBook
+ * @param {string} [key]
+ * @returns {*[]}
+ */
+function saveFile([meta, htmlBook], key) {
+    const bookContent = { meta, htmlBook: htmlBook.outerHTML ?? htmlBook };
+    if (key !== undefined) {
+        bookContent.position = meta.position;
+    }
+    set(key ?? 'current-book', bookContent);
+
     return [meta, htmlBook];
 }
 
@@ -153,10 +180,11 @@ function showParsedFile([meta, htmlBook], initialPosition = 0) {
     } else {
         bookEl.appendChild(htmlBook);
     }
+    bookMeta = meta;
     showBookInfo(meta);
     const actualHtmlBook = bookEl.firstChild;
     actualHtmlBook.addEventListener('click', handleInternalLinks, true);
-    fEl.style.visibility = 'hidden';
+    welcomeEl.style.visibility = 'hidden';
     bookPosition = new BookPosition(actualHtmlBook);
     window.bp = bookPosition;
     window.addEventListener('keyup', pageControl);

@@ -136,9 +136,10 @@ function parseAuthor(author) {
 
 /**
  * @param {Document} xml
+ * @param {string} fileName
  * @return {Fb2Meta}
  */
-function getMeta(xml) {
+function getMeta(xml, fileName) {
     const titleInfo = xml.querySelector('description>title-info');
     const annotation = titleInfo.getElementsByTagName('annotation')[0];
     const title = stripTags(titleInfo.getElementsByTagName('book-title')[0].innerHTML);
@@ -147,7 +148,7 @@ function getMeta(xml) {
     const sequenceName = sequence?.attributes.name?.value;
     const sequenceNumber = sequence?.attributes.number?.value;
 
-    return { title, authors, annotationHtml: annotation?.innerHTML ?? '', sequenceName, sequenceNumber };
+    return { title, authors, annotationHtml: annotation?.innerHTML ?? '', sequenceName, sequenceNumber, fileName };
 }
 
 /**
@@ -192,5 +193,5 @@ export default async function processFile(file) {
     }
     if (!xml.querySelector('FictionBook')) throw new DOMException('Non-FB2 document detected', 'NONFB2');
 
-    return [getMeta(xml), await renderBook(xml)];
+    return [getMeta(xml, file.name), await renderBook(xml)];
 }

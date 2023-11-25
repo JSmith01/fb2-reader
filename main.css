@@ -199,12 +199,14 @@ a {
 a:hover {
     text-decoration: underline;
 }
-input#f {
+#welcome {
     z-index: 7;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+}
+input#f {
 }
 .ui-btn, .ui-btn-big {
     width: 22px;
