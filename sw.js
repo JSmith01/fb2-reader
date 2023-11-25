@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fb2-reader-v0.0.9';
+const CACHE_NAME = 'fb2-reader-v0.0.10';
 
 const urlsToCache = [
     './',
@@ -10,6 +10,8 @@ const urlsToCache = [
     'js/main.js',
     'js/process-fb2.js',
     'js/swipe.js',
+    'js/bookshelf.js',
+    'js/utils.js',
     'js/thirdparty/idb-keyval.js',
     'js/thirdparty/unzipit.module.js',
     'js/thirdparty/unzipit-worker.module.js',
