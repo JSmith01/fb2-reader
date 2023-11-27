@@ -4,6 +4,12 @@
   "license": "MIT",
   "author": "Dmitry Zlygin <dzlygin@gmail.com>",
   "scripts": {
-    "start": "npx serve ."
+    "start": "npx serve .",
+    "test": "playwright test",
+    "test-report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "@types/node": "^20.10.0"
   }
 }
