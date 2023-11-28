@@ -3,10 +3,11 @@
 * proper saving for books positions
 * don't ask to save books already in the bookshelf
 * ask to save book to the bookshelf on change via drag'n'drop
-* E2E regression tests
+* add more E2E tests
 * error handling
 * add the navigation window with table of contents
 * UI design (hints or tooltips for shortcuts; a11y maybe?)
+* ~~E2E regression tests~~
 * ~~bookshelf~~
 * ~~unit tests infrastructure~~
 * ~~fullscreen button~~
