@@ -8,6 +8,7 @@
 * add the navigation window with table of contents
 * UI design (hints or tooltips for shortcuts; a11y maybe?)
 * ~~bookshelf~~
+* ~~unit tests infrastructure~~
 * ~~fullscreen button~~
 * ~~touch interface (at least prev/next pages)~~
 * ~~set page title according to opened book~~
