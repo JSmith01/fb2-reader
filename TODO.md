@@ -1,12 +1,13 @@
 # TODO
 
 * proper saving for books positions
-* don't ask to save books already in the bookshelf
-* ask to save book to the bookshelf on change via drag'n'drop
+* don't ask to save books already on the bookshelf
+* ask to save a book to the bookshelf on a change via drag'n'drop
 * add more E2E tests
 * error handling
 * add the navigation window with table of contents
 * UI design (hints or tooltips for shortcuts; a11y maybe?)
+* (nice to have) hint current chapter
 * ~~E2E regression tests~~
 * ~~bookshelf~~
 * ~~unit tests infrastructure~~
@@ -27,5 +28,5 @@
 * ~~vertical rhythm~~
 * ~~font size selection~~
 * ~~service worker for offline mode~~
-* ~~show time & battery (if available) - when in full screen~~
-* single column mode is broken in Safari - text is vertically aligned (not horizontally)
+* ~~show time & battery (if available) — when in full screen~~
+* single column mode is broken in Safari — a text is vertically aligned (not horizontally)
