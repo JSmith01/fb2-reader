@@ -1,3 +1,5 @@
+// noinspection CssInvalidHtmlTagReference
+
 import { unzip, setOptions } from './thirdparty/unzipit.module.js';
 
 setOptions({
@@ -136,10 +138,9 @@ function parseAuthor(author) {
 
 /**
  * @param {Document} xml
- * @param {string} fileName
  * @return {Fb2Meta}
  */
-function getMeta(xml, fileName) {
+function getMeta(xml) {
     const titleInfo = xml.querySelector('description>title-info');
     const annotation = titleInfo.getElementsByTagName('annotation')[0];
     const title = stripTags(titleInfo.getElementsByTagName('book-title')[0].innerHTML);
@@ -148,7 +149,7 @@ function getMeta(xml, fileName) {
     const sequenceName = sequence?.attributes.name?.value;
     const sequenceNumber = sequence?.attributes.number?.value;
 
-    return { title, authors, annotationHtml: annotation?.innerHTML ?? '', sequenceName, sequenceNumber, fileName };
+    return { title, authors, annotationHtml: annotation?.innerHTML ?? '', sequenceName, sequenceNumber };
 }
 
 /**
@@ -183,7 +184,7 @@ async function unzipFb2(file) {
 
 /**
  * @param {File} file
- * @return {Promise<[Fb2Meta, ChildNode]>}
+ * @return {Promise<{ meta: Fb2Meta, book: ChildNode }>}
  */
 export default async function processFile(file) {
     const fb2File = file.name.endsWith('.zip') ? await unzipFb2(file) : file;
@@ -193,5 +194,5 @@ export default async function processFile(file) {
     }
     if (!xml.querySelector('FictionBook')) throw new DOMException('Non-FB2 document detected', 'NONFB2');
 
-    return [getMeta(xml, file.name), await renderBook(xml)];
+    return { meta: getMeta(xml), book: await renderBook(xml) };
 }

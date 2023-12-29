@@ -5,9 +5,19 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="description" content="Web FB2 Reader (including zip-ped fb2 files)">
     <title>FB2 Reader</title>
     <link rel="stylesheet" href="main.css">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <script>
+        if ('serviceWorker' in navigator) {
+            if (location.hostname === 'localhost' && location.hash !== '#sw') {
+                console.log('no service worker for localhost unless #sw is used');
+            } else {
+                navigator.serviceWorker.register('sw.js');
+            }
+        }
+    </script>
 </head>
 <body>
 <script src="js/components/index.js" type="module"></script>
@@ -47,14 +57,5 @@
 </div>
 
 <script type="module" src="js/main.js"></script>
-<script>
-    if ('serviceWorker' in navigator) {
-        if (location.hostname === 'localhost' && location.hash !== '#sw') {
-            console.log('no service worker for localhost unless #sw is used');
-        } else {
-            navigator.serviceWorker.register('sw.js');
-        }
-    }
-</script>
 </body>
 </html>

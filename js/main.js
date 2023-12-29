@@ -1,9 +1,17 @@
-import { set, get, delMany, getMany } from './thirdparty/idb-keyval.js';
 import processFile from './process-fb2.js';
 import BookPosition from './book-position.js';
 import { getSwipe } from './swipe.js';
-import { absorb, digestMessage } from './utils.js';
+import { absorb } from './utils.js';
 import { openBookshelf } from './bookshelf.js';
+import {
+    clearCurrentBook,
+    getCurrentBookId,
+    loadBook,
+    loadBookPosition,
+    saveBook,
+    saveBookPosition,
+    setCurrentBookId,
+} from './book-storage.js';
 
 const Fb2ReaderTitle = 'FB2 Reader';
 
@@ -18,14 +26,20 @@ const topInfoBlock = document.getElementById('top-book-info');
 const progressBlock = document.getElementById('progress');
 
 
-preloadSavedFile();
+getCurrentBookId().then(id => {
+    if (id) {
+        preloadSavedFile(id);
+    }
+});
 
 fEl.addEventListener('change', () => {
     if (fEl.files.length > 0) handleFile(fEl.files[0]);
 });
 
 welcomeEl.querySelector('.open-shelf').onclick = () => {
-    openBookshelf(preloadSavedFile);
+    openBookshelf(key => {
+        preloadSavedFile(key).then(() => setCurrentBookId(key));
+    });
 }
 
 bookEl.addEventListener('dragover', absorb);
@@ -55,12 +69,9 @@ function bookCleanup(full = false) {
         clearTimeout(finalizeBookTo);
         finalizeBookTo = null;
     }
-    if (full && confirm('Save current book to the bookshelf?')) {
-        const meta = { ...bookMeta };
-        meta.position = bookPosition.getCurrentPercent();
-        const bookContent = bookEl.innerHTML;
-        digestMessage(meta.fileName).then(key => saveFile([meta, bookContent], key));
-    }
+    /*if (full && confirm('Save current book to the bookshelf?')) {
+        saveBook(bookMeta, bookEl.innerHTML);
+    }*/
     bookResizeObserver?.disconnect();
     bookResizeObserver = null;
     fontChangeObserver?.disconnect();
@@ -69,7 +80,8 @@ function bookCleanup(full = false) {
     swipeCleanup?.();
     swipeCleanup = null;
     bookPosition = null;
-    updateFooter();
+    bookMeta = null;
+    updateFooter(false);
     internalLinksPath.length = 0;
     if (bookEl.hasChildNodes()) {
         bookEl.removeChild(bookEl.firstChild);
@@ -79,7 +91,7 @@ function bookCleanup(full = false) {
         welcomeEl.style.visibility = 'visible';
         topInfoBlock.innerHTML = '';
         fEl.value = '';
-        delMany(['current-book', 'current-book-position']);
+        clearCurrentBook();
     }
     bookInfoBlock.classList.add('disabled');
     document.title = Fb2ReaderTitle;
@@ -141,39 +153,23 @@ let finalizeBookTo = null;
 let bookResizeObserver = null;
 /** @type {MutationObserver} */
 let fontChangeObserver = null;
+/** @type {Fb2Meta} */
 let bookMeta;
 
 async function preloadSavedFile(key) {
-    let currentBook, currentBookPosition;
-    if (!key) {
-        [currentBook, currentBookPosition] = await getMany(['current-book', 'current-book-position']);
-    } else {
-        currentBook = await get(key);
-        currentBookPosition = currentBook.position;
-    }
+    const currentBook = await loadBook(key);
     if (currentBook) {
-        const position = currentBookPosition != null ? parseFloat(currentBookPosition) : 0;
-        showParsedFile([currentBook.meta, currentBook.htmlBook], position);
+        const position = await loadBookPosition(currentBook.meta);
+        showParsedFile(currentBook.meta, currentBook.htmlBook, position);
     }
 }
 
 /**
- * @param {object} meta
- * @param {ChildNode} htmlBook
- * @param {string} [key]
- * @returns {*[]}
+ * @param {Fb2Meta} meta
+ * @param {ChildNode|string} htmlBook
+ * @param {number} initialPosition
  */
-function saveFile([meta, htmlBook], key) {
-    const bookContent = { meta, htmlBook: htmlBook.outerHTML ?? htmlBook };
-    if (key !== undefined) {
-        bookContent.position = meta.position;
-    }
-    set(key ?? 'current-book', bookContent);
-
-    return [meta, htmlBook];
-}
-
-function showParsedFile([meta, htmlBook], initialPosition = 0) {
+function showParsedFile(meta, htmlBook, initialPosition) {
     bookCleanup();
     if (typeof htmlBook === 'string') {
         bookEl.innerHTML = htmlBook;
@@ -197,13 +193,14 @@ function showParsedFile([meta, htmlBook], initialPosition = 0) {
     });
     finalizeBookTo = setTimeout(() => {
         bookPosition.calcPagination();
-        updateFooter();
+        updateFooter(false);
         if (initialPosition > 0) {
             bookPosition.goToPercent(initialPosition);
+            updateFooter(false);
         }
         const domChangeObserver = () => {
             bookPosition.handleDomChanges();
-            updateFooter();
+            updateFooter(false);
         };
         bookResizeObserver = new ResizeObserver(domChangeObserver);
         bookResizeObserver.observe(actualHtmlBook);
@@ -213,18 +210,15 @@ function showParsedFile([meta, htmlBook], initialPosition = 0) {
     }, 20);
 }
 
-function handleFile(file) {
-    processFile(file).then(saveFile).then(
-        showParsedFile,
-        e => {
-            console.log(e);
-            alert(e.message);
-        }
-    );
-}
-
-function memorizePosition(pos) {
-    set('current-book-position', pos);
+async function handleFile(file) {
+    const { meta, book } = await processFile(file);
+    if (!meta || !book) {
+        alert('incorrect book contents');
+        return;
+    }
+    const position = await loadBookPosition(meta);
+    showParsedFile(meta, book, position);
+    await saveBook(meta, book, true);
 }
 
 function showPercent(p) {
@@ -232,14 +226,16 @@ function showPercent(p) {
     document.getElementById('curPercent').innerText = p;
 }
 
-function updateFooter() {
+function updateFooter(savePosition = true) {
     document.getElementById('totalPages').innerText =
         String(bookPosition?.getTotalPages() ?? 0);
     document.getElementById('curPage').innerText =
         String((bookPosition?.getCurrentPage()  ?? 0) + (bookPosition ? 1 : 0));
     const currentPercent = bookPosition?.getCurrentPercent() ?? 0;
     showPercent(currentPercent?.toFixed(1) ?? 0);
-    memorizePosition(currentPercent);
+    if (bookPosition && savePosition) {
+        saveBookPosition(bookMeta, currentPercent);
+    }
 }
 
 function pageControl(e) {

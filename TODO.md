@@ -1,13 +1,14 @@
 # TODO
 
-* proper saving for books positions
-* don't ask to save books already on the bookshelf
-* ask to save a book to the bookshelf on a change via drag'n'drop
+* keep bookshelf free of unnecessary items
 * add more E2E tests
 * error handling
 * add the navigation window with table of contents
 * UI design (hints or tooltips for shortcuts; a11y maybe?)
-* (nice to have) hint current chapter
+* add a hint for the current chapter
+* ~~don't ask to save books already on the bookshelf~~
+* ~~ask to save a book to the bookshelf on a change via drag'n'drop~~
+* ~~proper saving for books positions~~
 * ~~E2E regression tests~~
 * ~~bookshelf~~
 * ~~unit tests infrastructure~~

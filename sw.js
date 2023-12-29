@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fb2-reader-v0.0.10';
+const CACHE_NAME = 'fb2-reader-v0.0.12';
 
 const urlsToCache = [
     './',
@@ -7,19 +7,22 @@ const urlsToCache = [
     'fb2-html.xsl',
     'main.css',
     'js/book-position.js',
+    'js/book-storage.js',
+    'js/bookshelf.js',
     'js/main.js',
     'js/process-fb2.js',
     'js/swipe.js',
-    'js/bookshelf.js',
     'js/utils.js',
     'js/thirdparty/idb-keyval.js',
     'js/thirdparty/unzipit.module.js',
     'js/thirdparty/unzipit-worker.module.js',
-    'js/components/index.js',
     'js/components/battery-indicator.js',
     'js/components/clock-indicator.js',
-    'js/components/theme-selector.js',
     'js/components/font-selector.js',
+    'js/components/fullscreen-button.js',
+    'js/components/index.js',
+    'js/components/theme-selector.js',
+    'js/components/utils.js',
 ];
 
 // Install a service worker

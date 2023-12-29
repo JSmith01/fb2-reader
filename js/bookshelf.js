@@ -1,5 +1,5 @@
-import { get, keys, del } from './thirdparty/idb-keyval.js';
 import { absorb } from './utils.js';
+import { getStoredBookIds, loadBook, removeBook } from './book-storage.js';
 
 /** @var {HTMLDialogElement} */
 const modal = document.getElementById('bookshelf-manager');
@@ -19,23 +19,35 @@ const makeOpenBookHandler = preloadSavedFile => function openBookFromShelf(e) {
     modal.close();
 }
 
-const makeRemoveBookHandler = openBookHandler => function deleteBookFromShelf(e) {
+const makeRemoveBookHandler = openBookHandler => async function deleteBookFromShelf(e) {
     absorb(e);
-    del(e.target.dataset.key);
-    openBookshelf(openBookHandler);
+    await removeBook(e.target.dataset.key);
+    return openBookshelf(openBookHandler);
 }
 
 function clearModal() {
     table.querySelectorAll('tr').forEach(el => table.removeChild(el));
 }
 
+/**
+ * @param {Fb2Meta} meta
+ */
+const getBookLinkText = meta => {
+    let bookText = `${meta.authors.join(', ')} - ${meta.title}`;
+    if (meta.sequenceName) {
+        bookText += ` (${meta.sequenceName}${meta.sequenceNumber ? ' #' + meta.sequenceNumber : ''})`;
+    }
+
+    return bookText;
+}
+
 async function updateBookshelf(openBookHandler) {
     const removeBookHandler = makeRemoveBookHandler(openBookHandler);
     clearModal();
-    const bookKeys = (await keys()).filter(k => !k.startsWith('current'));
+    const bookKeys = await getStoredBookIds();
     let booksCount = 0;
     for (const bookKey of bookKeys) {
-        const book = await get(bookKey);
+        const book = await loadBook(bookKey);
         if (!book?.meta) continue;
         const row = rowTemplate.content.cloneNode(true);
         const td = row.querySelector('td');
@@ -43,7 +55,7 @@ async function updateBookshelf(openBookHandler) {
         a.dataset.key = bookKey;
         a.onclick = openBookHandler;
         a.href = '#';
-        a.innerText = book.meta.title;
+        a.innerText = getBookLinkText(book.meta);
         td.appendChild(a);
         const btn = row.querySelector('button');
         btn.dataset.key = bookKey;
