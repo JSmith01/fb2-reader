@@ -41,13 +41,19 @@
             <tr><td colspan="2">No books on the bookshelf</td></tr>
         </template>
     </table>
-    <button class="close">Close bookshelf</button>
+    <button class="close" autofocus>Close bookshelf</button>
+</dialog>
+<dialog id="toc">
+    <h2>Table of contents</h2>
+    <div id="duplicated-toc"></div>
+    <button class="close" autofocus>close table of contents</button>
 </dialog>
 <div id="book"></div>
 <div class="book-info-trigger" id="top-book-info-trigger"></div>
 <div class="book-info disabled" id="book-info-block">
     <nav class="book-controls">
         <button id="back-link" class="ui-btn-big" title="return back">&larr;</button>
+        <button id="toc-link" class="ui-btn-big" title="table of contents">🖹</button>
         <button id="close-book" class="ui-btn-big" title="close the file">&times;</button>
         <theme-selector></theme-selector>
         <font-selector></font-selector>
