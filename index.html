@@ -56,6 +56,15 @@
     <div id="top-book-info"></div>
 </div>
 
+<script type="module">
+	import { loadBookFromUrl } from './js/url-loader.js';
+	const urlParams = new URLSearchParams(window.location.search);
+	const bookUrl = urlParams.get('url');
+	if (bookUrl) {
+	    loadBookFromUrl(bookUrl);
+	}
+</script>
+
 <script type="module" src="js/main.js"></script>
 </body>
 </html>
