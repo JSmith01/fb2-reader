@@ -6,15 +6,32 @@ const BOOK_PREFIX = 'book-';
 
 const cache = new WeakMap();
 
+// check if crypto.subtle is availible
+const isSecure = window.isSecureContext === true;
+const hasCryptoSubtle = typeof crypto !== 'undefined' && crypto.subtle !== undefined;
+
 /**
  * @param {string} message
  * @param {AlgorithmIdentifier} algorithm
  * @returns {Promise<string>}
  */
-const digestMessage = (message, algorithm = 'sha-256') =>
-    crypto.subtle.digest(algorithm, new TextEncoder().encode(message)).then(
-        data => Array.from(new Uint8Array(data)).map((b) => b.toString(16).padStart(2, "0")).join("")
-    );
+const digestMessage = (message, algorithm = 'sha-256') => {
+    if (isSecure && hasCryptoSubtle) {
+        return crypto.subtle.digest(algorithm, new TextEncoder().encode(message))
+            .then(data => Array.from(new Uint8Array(data))
+                .map((b) => b.toString(16).padStart(2, "0"))
+                .join("")
+            );
+    } else {
+        // Imitate hash function if no HTTPS
+        let hash = 0;
+        for (let i = 0; i < message.length; i++) {
+            hash = (hash * 31 + message.charCodeAt(i)) & 0xFFFFFFFF;
+        }
+        return Promise.resolve(hash.toString(16).padStart(8, '0'));
+    }
+};
+
 
 
 /**
