@@ -52,15 +52,28 @@ async function readFb2File(file) {
     return new DOMParser().parseFromString(content, 'application/xml');
 }
 
-function loadXml(url) {
-    return new Promise((resolve, reject) => {
-        const req = new XMLHttpRequest();
-        req.addEventListener('load', () => resolve(req.responseXML));
-        req.addEventListener('error', reject);
-        req.open('GET', url);
-        req.responseType = 'document';
-        req.send();
-    });
+async function loadXml(url) {
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const xmlText = await response.text();
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+
+        // Check for XML parsing errors
+        const parserError = xmlDoc.querySelector('parsererror');
+        if (parserError) {
+            throw new Error('XML parsing error: ' + parserError.textContent);
+        }
+
+        return xmlDoc;
+    } catch (error) {
+        console.error('Failed to load XML:', error);
+        throw error;
+    }
 }
 
 let xsltProcessor;
